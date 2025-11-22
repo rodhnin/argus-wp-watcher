@@ -1,0 +1,242 @@
+# Argus - Default Configuration
+# Override via environment variables or command-line flags
+
+# ============================================================================
+# GENERAL SETTINGS
+# ============================================================================
+general:
+  version: "0.1.0"
+  author: "Rodney Dhavid Jimenez Chacin (rodhnin)"
+  github: "https://github.com/rodhnin/argus-wp-watcher"
+
+# ============================================================================
+# PATHS & STORAGE
+# ============================================================================
+paths:
+  # Reports output directory (auto-created if doesn't exist)
+  report_dir: "~/.argus/reports"
+  
+  # SQLite database (shared across Argus, Hephaestus, Pythia, Asterion)
+  database: "~/.argos/argos.db"
+  
+  # Log file location (set to null to disable file logging)
+  log_file: "~/.argus/argus.log"
+  
+  # Consent token verification evidence storage
+  consent_proofs_dir: "~/.argus/consent-proofs"
+
+# ============================================================================
+# SCAN BEHAVIOR
+# ============================================================================
+scan:
+  # Default scan mode (safe = non-intrusive, aggressive = requires consent)
+  default_mode: "safe"
+  
+  # Request rate limiting (requests per second)
+  rate_limit:
+    safe_mode: 5.0        # Conservative rate for safe scanning
+    aggressive_mode: 10.0  # Higher rate when authorized
+  
+  # HTTP timeouts (seconds)
+  timeout:
+    connect: 10
+    read: 30
+  
+  # User-Agent string for HTTP requests
+  user_agent: "Argus/0.1.0"
+  
+  # Follow redirects
+  follow_redirects: true
+  max_redirects: 5
+  
+  # Verify SSL certificates (set to false for testing self-signed certs)
+  verify_ssl: true
+
+# ============================================================================
+# WORDPRESS-SPECIFIC SETTINGS
+# ============================================================================
+wordpress:
+  # Common WordPress paths to check
+  common_paths:
+    - "/readme.html"
+    - "/license.txt"
+    - "/wp-config.php"
+    - "/wp-config.php.bak"
+    - "/wp-config.php~"
+    - "/wp-config.php.old"
+    - "/wp-config.php.save"
+    - "/wp-content/debug.log"
+    - "/xmlrpc.php"
+    - "/.git/HEAD"
+    - "/.env"
+    - "/backup.zip"
+    - "/backup.sql"
+    - "/dump.sql"
+    - "/database.sql"
+  
+  # Plugin/theme enumeration wordlists (built-in, minimal)
+  enumeration:
+    max_plugins_to_check: 100   # Limit in safe mode
+    max_themes_to_check: 20
+    common_plugins:  # Top vulnerable/popular plugins to prioritize
+      - "akismet"
+      - "jetpack"
+      - "wordfence"
+      - "contact-form-7"
+      - "yoast-seo"
+      - "elementor"
+      - "woocommerce"
+      - "all-in-one-wp-migration"
+    common_themes:
+      - "twentytwentyfour"
+      - "twentytwentythree"
+      - "twentytwentytwo"
+      - "twentytwentyone"
+      - "astra"
+      - "generatepress"
+  
+  # User enumeration settings
+  user_enumeration:
+    check_author_idor: true      # Test /?author=N
+    check_rest_api: true         # Test /wp-json/wp/v2/users
+    max_users_to_check: 10       # Limit in safe mode
+
+# ============================================================================
+# CONSENT TOKEN SETTINGS
+# ============================================================================
+consent:
+  # Token expiration time (hours)
+  token_expiry_hours: 48
+  
+  # Token generation (hex length)
+  token_hex_length: 16
+  
+  # HTTP verification path
+  http_verification_path: "/.well-known/"
+  
+  # DNS TXT record prefix
+  dns_txt_prefix: "argus-verify="
+  
+  # Retry settings for verification
+  verification_retries: 3
+  verification_retry_delay: 2  # seconds
+
+# ============================================================================
+# REPORTING
+# ============================================================================
+reporting:
+  # Report format options
+  format:
+    json: true          # Always generate JSON
+    html: false         # Generate HTML only if --html flag or this is true
+  
+  # JSON output formatting
+  json_indent: 2        # Pretty-print with 2-space indentation
+  
+  # HTML template customization
+  html:
+    include_evidence: true
+    include_raw_requests: false  # Don't include full HTTP dumps by default
+    css_inline: true             # Embed CSS in HTML (self-contained)
+
+# ============================================================================
+# LOGGING
+# ============================================================================
+logging:
+  # Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  level: "INFO"
+  
+  # Log format
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+  date_format: "%Y-%m-%d %H:%M:%S"
+  
+  # Structured JSON logging (for parsing/analysis)
+  json_format: false
+  
+  # Redaction settings (remove sensitive data from logs)
+  redact:
+    enabled: true
+    patterns:
+      - "password"
+      - "token"
+      - "api_key"
+      - "secret"
+      - "authorization"
+      - "cookie"
+  
+  # Console output colors (disable in CI/piped environments)
+  colors: true
+
+# ============================================================================
+# AI INTEGRATION (LangChain)
+# ============================================================================
+ai:
+  # Enable AI features (requires --use-ai flag AND verified consent)
+  enabled: false
+  
+  # LangChain settings
+  langchain:
+    # LLM provider (openai, anthropic, ollama
+    provider: "openai"
+    
+    # Model selection
+    model: "gpt-4-turbo-preview"
+    
+    # Temperature (0.0 = deterministic, 1.0 = creative)
+    temperature: 0.3
+    
+    # Max tokens for response
+    max_tokens: 2000
+    
+    # Agent type (zero-shot-react-description, conversational, etc.)
+    agent_type: "zero-shot-react-description"
+    
+    #Ollama Server
+    ollama_base_url: "http://localhost:11434"
+    
+    # Memory configuration
+    memory:
+      enabled: true
+      type: "buffer"  # buffer, summary, or conversation
+      max_history: 10
+  
+  # API key source (environment variable name)
+  api_key_env: "OPENAI_API_KEY"
+  
+  # Prompt templates directory
+  prompts_dir: "config/prompts"
+  
+  # Sanitization settings
+  sanitization:
+    remove_urls: false         # Keep URLs for context
+    remove_tokens: true        # Always strip tokens
+    remove_credentials: true   # Always strip passwords/keys
+    max_evidence_length: 500   # Truncate long evidence snippets
+
+# ============================================================================
+# ADVANCED / EXPERIMENTAL
+# ============================================================================
+advanced:
+  # Concurrent requests (use with caution)
+  max_workers: 5
+  
+  # Cache HTTP responses (for development/testing)
+  cache_responses: false
+  cache_ttl_seconds: 3600
+  
+  # Custom headers to add to all requests
+  custom_headers: {}
+  
+  # Proxy settings (leave empty for no proxy)
+  proxy:
+    http: null
+    https: null
+
+# ============================================================================
+# DOCKER / CONTAINER SETTINGS
+# ============================================================================
+docker:
+  # Adjust paths when running in container
+  in_container: false
+  container_report_dir: "/reports"
+  container_db_path: "/data/argos.db"

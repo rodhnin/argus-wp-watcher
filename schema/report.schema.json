@@ -1,0 +1,261 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://rodhnin.github.io/argus/report.schema.json",
+    "title": "Argos Suite Security Report",
+    "description": "Unified report format for Argus (WordPress), Hephaestus (server), and Pythia (SQLi), Asterion (Network)",
+    "type": "object",
+    "required": ["tool", "version", "target", "date", "mode", "summary", "findings"],
+    "properties": {
+        "tool": {
+            "type": "string",
+            "enum": ["argus", "hephaestus", "pythia", "asterion"],
+            "description": "Tool that generated this report"
+        },
+        "version": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+\\.\\d+$",
+            "description": "Tool version (semantic versioning)",
+            "examples": ["0.1.0", "1.2.3"]
+        },
+        "target": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Target URL or domain scanned",
+            "examples": ["https://example.com", "example.com"]
+        },
+        "date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Scan completion timestamp (ISO 8601 UTC)"
+        },
+        "mode": {
+            "type": "string",
+            "enum": ["safe", "aggressive"],
+            "description": "Scan mode: safe (non-intrusive) or aggressive (requires consent)"
+        },
+        "summary": {
+            "type": "object",
+            "required": ["critical", "high", "medium", "low", "info"],
+            "description": "Count of findings by severity level",
+            "properties": {
+                "critical": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Immediate action required (e.g., exposed credentials)"
+                },
+                "high": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Serious vulnerabilities (e.g., known CVE with exploit)"
+                },
+                "medium": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Moderate risk (e.g., version disclosure, weak config)"
+                },
+                "low": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Minor issues (e.g., missing best practices)"
+                },
+                "info": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Informational only (e.g., technology fingerprint)"
+                }
+            },
+            "additionalProperties": false
+        },
+        "findings": {
+            "type": "array",
+            "description": "List of security findings/vulnerabilities detected",
+            "items": {
+                "type": "object",
+                "required": ["id", "title", "severity", "confidence", "recommendation"],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "pattern": "^[A-Z]+-[A-Z]+-\\d{3}$",
+                        "description": "Unique finding identifier (e.g., ARGUS-WP-001)",
+                        "examples": ["ARGUS-WP-001", "HEPH-SRV-042", "PYTHIA-SQL-010"]
+                    },
+                    "title": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200,
+                        "description": "Short, descriptive title of the finding"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Detailed explanation of the vulnerability or issue"
+                    },
+                    "severity": {
+                        "type": "string",
+                        "enum": ["critical", "high", "medium", "low", "info"],
+                        "description": "Severity rating based on impact and exploitability"
+                    },
+                    "confidence": {
+                        "type": "string",
+                        "enum": ["high", "medium", "low"],
+                        "description": "Confidence level in the finding (high = confirmed, low = heuristic)"
+                    },
+                    "evidence": {
+                        "type": "object",
+                        "required": ["type", "value"],
+                        "description": "Proof of the finding (URL, header, file path, etc.)",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": ["url", "header", "body", "path", "screenshot", "other"],
+                                "description": "Type of evidence collected"
+                            },
+                            "value": {
+                                "type": "string",
+                                "description": "Evidence content (sanitized, no secrets)"
+                            },
+                            "context": {
+                                "type": "string",
+                                "description": "Additional context (e.g., HTTP status code, response time)"
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "recommendation": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Actionable remediation guidance"
+                    },
+                    "references": {
+                        "type": "array",
+                        "description": "External references (CVE, OWASP, vendor docs)",
+                        "items": {
+                            "type": "string",
+                            "format": "uri"
+                        }
+                    },
+                    "cve": {
+                        "type": "array",
+                        "description": "Related CVE identifiers (if applicable)",
+                        "items": {
+                            "type": "string",
+                            "pattern": "^CVE-\\d{4}-\\d{4,}$"
+                        }
+                    },
+                    "affected_component": {
+                        "type": "string",
+                        "description": "Specific component affected (e.g., plugin name, file path)"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        "notes": {
+            "type": "object",
+            "description": "Additional metadata and scanning context",
+            "properties": {
+                "scan_duration_seconds": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "requests_sent": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "rate_limit_applied": {
+                    "type": "boolean"
+                },
+                "scope_limitations": {
+                    "type": "string",
+                    "description": "Any scope restrictions or assumptions made"
+                },
+                "false_positive_disclaimer": {
+                    "type": "string",
+                    "default": "Manual verification recommended for all findings before remediation."
+                }
+            },
+            "additionalProperties": true
+        },
+        "consent": {
+            "type": "object",
+            "description": "Ownership verification details (if aggressive/AI mode used)",
+            "properties": {
+                "method": {
+                    "type": "string",
+                    "enum": ["http", "dns"]
+                },
+                "token": {
+                    "type": "string",
+                    "pattern": "^verify-[a-f0-9]{16}$"
+                },
+                "verified_at": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            },
+            "required": ["method", "token", "verified_at"],
+            "additionalProperties": false
+        },
+        "ai_analysis": {
+            "type": "object",
+            "description": "AI-generated summaries (only if --use-ai enabled)",
+            "properties": {
+                "executive_summary": {
+                    "type": "string",
+                    "description": "Non-technical summary for stakeholders"
+                },
+                "technical_remediation": {
+                    "type": "string",
+                    "description": "Step-by-step technical guidance for engineers"
+                },
+                "generated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "model_used": {
+                    "type": "string",
+                    "description": "AI model identifier (e.g., gpt-4-turbo)"
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false,
+    "examples": [
+        {
+            "tool": "argus",
+            "version": "0.1.0",
+            "target": "https://example.com",
+            "date": "2025-10-11T14:30:00Z",
+            "mode": "safe",
+            "summary": {
+                "critical": 0,
+                "high": 1,
+                "medium": 3,
+                "low": 2,
+                "info": 5
+            },
+            "findings": [
+                {
+                    "id": "ARGUS-WP-001",
+                    "title": "WordPress core version disclosed",
+                    "description": "The WordPress version is exposed via the readme.html file, allowing attackers to identify potential vulnerabilities.",
+                    "severity": "medium",
+                    "confidence": "high",
+                    "evidence": {
+                        "type": "url",
+                        "value": "https://example.com/readme.html",
+                        "context": "HTTP 200, version 5.8 detected"
+                    },
+                    "recommendation": "Remove or restrict access to readme.html. Update WordPress to the latest version and hide version information using plugins or custom code.",
+                    "references": ["https://wordpress.org/documentation/article/hardening-wordpress/"]
+                }
+            ],
+            "notes": {
+                "scan_duration_seconds": 45.3,
+                "requests_sent": 127,
+                "rate_limit_applied": true,
+                "scope_limitations": "Scan limited to publicly accessible pages. No authenticated testing performed."
+            }
+        }
+    ]
+}

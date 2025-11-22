@@ -1,0 +1,72 @@
+# Argus - WordPress Security Scanner
+# Production deployment configuration
+# For testing lab with vulnerable WordPress, use compose.testing.yml
+
+services:
+    # Argus Scanner
+    argus:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile
+        container_name: argus-scanner
+        environment:
+            - ARGUS_DOCKER_IN_CONTAINER=true
+        volumes:
+            - ./reports:/reports
+            - ./data:/data
+        networks:
+            - argus-network
+        entrypoint: ["/bin/sh", "-c"]
+        command:
+            - |
+                echo "========================================"
+                echo "Argus WordPress Security Scanner"
+                echo "========================================"
+                echo ""
+                echo "Usage:"
+                echo "  docker compose exec argus python -m argus --target <URL>"
+                echo ""
+                echo "Examples:"
+                echo "  docker compose exec argus python -m argus --target https://example.com"
+                echo "  docker compose exec argus python -m argus --target https://example.com --use-ai"
+                echo "  docker compose exec argus python -m argus --help"
+                echo ""
+                echo "Reports will be saved to: ./reports/"
+                echo "Database location: ./data/argos.db"
+                echo "========================================"
+                exec tail -f /dev/null
+
+networks:
+    argus-network:
+        name: argus-network
+        driver: bridge
+# ==============================================================================
+# USAGE INSTRUCTIONS
+# ==============================================================================
+#
+# 1. START ARGUS:
+#    docker compose up -d
+#
+# 2. SCAN A TARGET:
+#    docker compose exec argus python -m argus --target https://example.com
+#
+# 3. SCAN WITH AI ANALYSIS (requires API key):
+#    docker compose exec argus python -m argus --target https://example.com --use-ai
+#
+# 4. VIEW REPORTS:
+#    Reports are saved in: ./reports/
+#    Database is saved in: ./data/argos.db
+#
+# 5. STOP ARGUS:
+#    docker compose down
+#
+# ==============================================================================
+# TESTING LAB
+# ==============================================================================
+# To deploy a vulnerable WordPress environment for testing:
+#    docker compose -f compose.testing.yml up -d
+#
+# Or use the interactive deployment script:
+#    ./deploy.sh
+#
+# ==============================================================================

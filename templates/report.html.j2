@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Argus {{ version }}">
+    <title>Argus Security Report — {{ target }}</title>
+    <style>
+        :root {
+            --argus-purple: #667eea;
+            --argus-deep: #764ba2;
+            --argus-blue: #4299e1;
+            --argus-dark: #2c3e50;
+            --critical: #dc3545;
+            --high: #fd7e14;
+            --medium: #ffc107;
+            --low: #17a2b8;
+            --info: #6c757d;
+            --bg-light: #f5f7ff;
+            --text-dark: #2c3e50;
+            --text-light: #6c757d;
+            --border: #e3e8ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--bg-light);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid var(--border);
+        }
+
+        /* ============================================================================
+           HEADER - ARGUS ALL-SEEING GUARDIAN
+           ============================================================================ */
+        header {
+            background: linear-gradient(135deg, var(--argus-purple) 0%, var(--argus-deep) 50%, var(--argus-blue) 100%);
+            color: white;
+            padding: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Shield pattern background */
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.03) 20px, rgba(255,255,255,0.03) 40px),
+                repeating-linear-gradient(-45deg, transparent, transparent 20px, rgba(255,255,255,0.03) 20px, rgba(255,255,255,0.03) 40px);
+            opacity: 0.4;
+        }
+
+        header::after {
+            content: '🛡️';
+            position: absolute;
+            top: 20px;
+            right: 50px;
+            font-size: 80px;
+            opacity: 0.15;
+            transform: rotate(15deg);
+        }
+
+        .logo {
+            font-size: 60px;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 8px rgba(0,0,0,0.4);
+            position: relative;
+            z-index: 1;
+        }
+
+        header h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            font-weight: 800;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.95;
+            font-weight: 400;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tagline {
+            font-size: 14px;
+            opacity: 0.85;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.9);
+            position: relative;
+            z-index: 1;
+        }
+
+        .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-top: 25px;
+            font-size: 14px;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .meta-item strong {
+            font-weight: 600;
+        }
+
+        /* Summary Pills */
+        .summary-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .pill-critical { background: var(--critical); }
+        .pill-high { background: var(--high); }
+        .pill-medium { background: var(--medium); color: #333; }
+        .pill-low { background: var(--low); }
+        .pill-info { background: var(--info); }
+
+        /* ============================================================================
+           CONTENT
+           ============================================================================ */
+        .content {
+            padding: 50px;
+        }
+
+        section {
+            margin-bottom: 50px;
+        }
+
+        h2 {
+            font-size: 28px;
+            color: var(--argus-purple);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--border);
+            position: relative;
+        }
+
+        h2::before {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 120px;
+            height: 3px;
+            background: var(--argus-purple);
+        }
+
+        /* ============================================================================
+           OVERVIEW SECTION
+           ============================================================================ */
+        .overview {
+            background: linear-gradient(135deg, var(--bg-light) 0%, #e3e8ff 100%);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border-left: 5px solid var(--argus-purple);
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.1);
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .overview-item {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 3px solid var(--argus-deep);
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .overview-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+        }
+
+        .overview-item label {
+            font-size: 12px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .overview-item .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--argus-purple);
+            margin-top: 8px;
+        }
+
+        /* ============================================================================
+           AI ANALYSIS SECTION - WITH DYNAMIC TABS
+           ============================================================================ */
+        .ai-analysis {
+            background: linear-gradient(135deg, #fff 0%, var(--bg-light) 100%);
+            border-radius: 8px;
+            padding: 35px;
+            margin-bottom: 40px;
+            border-left: 5px solid var(--argus-deep);
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.15);
+        }
+
+        .ai-analysis h2 {
+            color: var(--argus-deep);
+        }
+
+        .ai-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            border-bottom: 3px solid var(--border);
+        }
+
+        .ai-tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--text-light);
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ai-tab:hover {
+            color: var(--argus-purple);
+        }
+
+        .ai-tab.active {
+            color: var(--argus-purple);
+            border-bottom-color: var(--argus-purple);
+        }
+
+        .ai-content {
+            display: none;
+            padding: 25px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .ai-content.active {
+            display: block;
+        }
+
+        /* Markdown styling in AI content */
+        .ai-content h3 {
+            color: var(--argus-purple);
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .ai-content h4 {
+            color: var(--argus-deep);
+            margin-top: 20px;
+            margin-bottom: 12px;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .ai-content h5 {
+            color: var(--argus-purple);
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .ai-content p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .ai-content ul,
+        .ai-content ol {
+            margin-left: 30px;
+            margin-top: 12px;
+            margin-bottom: 15px;
+        }
+
+        .ai-content li {
+            margin-bottom: 10px;
+            line-height: 1.7;
+        }
+
+        .ai-content strong {
+            color: var(--argus-deep);
+            font-weight: 700;
+        }
+
+        .ai-content code {
+            background: var(--bg-light);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: var(--argus-purple);
+            border: 1px solid var(--border);
+        }
+
+        .ai-content pre {
+            background: var(--argus-dark);
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-left: 4px solid var(--argus-purple);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .ai-content pre code {
+            background: none;
+            color: #f9fafb;
+            padding: 0;
+            border: none;
+        }
+
+        .ai-content blockquote {
+            border-left: 4px solid var(--argus-purple);
+            padding-left: 20px;
+            margin: 20px 0;
+            color: var(--text-light);
+            font-style: italic;
+            background: var(--bg-light);
+            padding: 15px 20px;
+            border-radius: 4px;
+        }
+
+        .ai-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .ai-content table th,
+        .ai-content table td {
+            border: 1px solid var(--border);
+            padding: 12px;
+            text-align: left;
+        }
+
+        .ai-content table th {
+            background: var(--bg-light);
+            font-weight: 700;
+            color: var(--argus-purple);
+        }
+
+        .ai-meta {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border);
+            font-size: 13px;
+            color: var(--text-light);
+            text-align: right;
+            font-style: italic;
+        }
+
+        /* ============================================================================
+           FINDINGS TABLE
+           ============================================================================ */
+        .findings {
+            background: white;
+            border-radius: 8px;
+            padding: 35px;
+            margin-bottom: 40px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            box-shadow: 0 2px 15px rgba(102, 126, 234, 0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--argus-purple) 0%, var(--argus-deep) 100%);
+            color: white;
+        }
+
+        th {
+            text-align: left;
+            padding: 18px 20px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+            font-size: 14px;
+        }
+
+        #findings tbody tr:hover {
+            background: var(--bg-light);
+            transition: background 0.2s ease;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .severity-critical { background: var(--critical); }
+        .severity-high { background: var(--high); }
+        .severity-medium { background: var(--medium); color: #333; }
+        .severity-low { background: var(--low); }
+        .severity-info { background: var(--info); }
+
+        .confidence-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+            font-weight: 600;
+        }
+
+        .evidence {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--argus-purple);
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            white-space: normal;
+            word-break: break-all;
+            margin-top: 10px;
+        }
+
+        /* ============================================================================
+           CONSENT & NOTES SECTIONS
+           ============================================================================ */
+        .consent {
+            background: linear-gradient(135deg, var(--argus-purple), var(--argus-deep));
+            color: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 3px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .consent h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            border-bottom: none;
+            color: white;
+        }
+
+        .consent h2::before {
+            display: none;
+        }
+
+        .consent-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .consent-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 18px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .consent-item label {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .consent-item .value {
+            font-size: 16px;
+            margin-top: 8px;
+            font-weight: 700;
+        }
+
+        .notes {
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border-left: 5px solid var(--argus-blue);
+            box-shadow: 0 2px 10px rgba(66, 153, 225, 0.1);
+        }
+
+        /* ============================================================================
+           FOOTER
+           ============================================================================ */
+        footer {
+            background: var(--argus-dark);
+            color: #e0e0e0;
+            padding: 35px 50px;
+            border-top: 5px solid var(--argus-purple);
+            font-size: 13px;
+        }
+
+        footer strong {
+            color: var(--argus-purple);
+            font-weight: 700;
+        }
+
+        footer a {
+            color: var(--argus-purple);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        footer a:hover {
+            color: var(--argus-blue);
+            text-decoration: underline;
+        }
+
+        /* ============================================================================
+           RESPONSIVE
+           ============================================================================ */
+        @media (max-width: 768px) {
+            header, .content, footer {
+                padding: 25px;
+            }
+            header h1 {
+                font-size: 32px;
+            }
+            .logo {
+                font-size: 50px;
+            }
+            h2 {
+                font-size: 22px;
+            }
+            table {
+                font-size: 12px;
+            }
+            th, td {
+                padding: 12px 10px;
+            }
+        }
+
+        /* ============================================================================
+           PRINT STYLES
+           ============================================================================ */
+        @media print {
+            header {
+                background: var(--argus-purple);
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <div class="logo">👁️</div>
+            <h1>ARGUS</h1>
+            <div class="subtitle">WordPress Security Scanner — All-Seeing Guardian</div>
+            <div class="tagline">"Eyes on the site. Proof in the log..."</div>
+            <div class="meta">
+                <div class="meta-item"><strong>🎯 Target:</strong> {{ target }}</div>
+                <div class="meta-item"><strong>📅 Date:</strong> {{ date }}</div>
+                <div class="meta-item"><strong>🔒 Mode:</strong> {{ mode|upper }}</div>
+                <div class="meta-item"><strong>⚙️ Version:</strong> Argus {{ version }}</div>
+            </div>
+            <div class="summary-pills">
+                <div class="pill pill-critical">Critical: {{ summary.critical }}</div>
+                <div class="pill pill-high">High: {{ summary.high }}</div>
+                <div class="pill pill-medium">Medium: {{ summary.medium }}</div>
+                <div class="pill pill-low">Low: {{ summary.low }}</div>
+                <div class="pill pill-info">Info: {{ summary.info }}</div>
+            </div>
+        </header>
+
+        <div class="content">
+            <!-- OVERVIEW -->
+            <div class="overview">
+                <h2>📊 Scan Overview</h2>
+                <div class="overview-grid">
+                    <div class="overview-item">
+                        <label>Total Findings</label>
+                        <div class="value">{{ findings|length }}</div>
+                    </div>
+                    <div class="overview-item">
+                        <label>Scan Mode</label>
+                        <div class="value">{{ mode|upper }}</div>
+                    </div>
+                    <div class="overview-item">
+                        <label>Target Type</label>
+                        <div class="value">WordPress</div>
+                    </div>
+                    {% if notes and notes.requests_sent %}
+                    <div class="overview-item">
+                        <label>HTTP Requests</label>
+                        <div class="value">{{ notes.requests_sent }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- CONSENT -->
+            {% if consent %}
+            <div class="consent">
+                <h2>✅ Ownership Verified</h2>
+                <div class="consent-details">
+                    <div class="consent-item">
+                        <label>Method</label>
+                        <div class="value">{{ consent.method|upper }}</div>
+                    </div>
+                    <div class="consent-item">
+                        <label>Token</label>
+                        <div class="value">{{ consent.token }}</div>
+                    </div>
+                    <div class="consent-item">
+                        <label>Verified</label>
+                        <div class="value">{{ consent.verified_at }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- AI ANALYSIS WITH DYNAMIC TABS -->
+            {% if ai and (ai.executive_summary or ai.technical_remediation) %}
+            <div class="ai-analysis">
+                <h2>🤖 AI-Powered Security Analysis</h2>
+                
+                {% set has_executive = ai.executive_summary and ai.executive_summary|length > 0 %}
+                {% set has_technical = ai.technical_remediation and ai.technical_remediation|length > 0 %}
+                
+                <!-- Show tabs only if both analyses exist -->
+                {% if has_executive and has_technical %}
+                <div class="ai-tabs">
+                    <button class="ai-tab active" onclick="showAiTab('executive')">Executive Summary</button>
+                    <button class="ai-tab" onclick="showAiTab('technical')">Technical Remediation</button>
+                </div>
+                {% endif %}
+                
+                <!-- Executive Summary -->
+                {% if has_executive %}
+                <div id="executive-tab" class="ai-content {% if not has_technical or has_executive %}active{% endif %}">
+                    {% if not has_technical %}
+                    <h3 style="color: var(--argus-purple); margin-bottom: 20px;">📊 Executive Summary</h3>
+                    {% endif %}
+                    {{ ai.executive_summary|safe }}
+                </div>
+                {% endif %}
+                
+                <!-- Technical Remediation -->
+                {% if has_technical %}
+                <div id="technical-tab" class="ai-content {% if not has_executive %}active{% endif %}">
+                    {% if not has_executive %}
+                    <h3 style="color: var(--argus-purple); margin-bottom: 20px;">🔧 Technical Remediation</h3>
+                    {% endif %}
+                    {{ ai.technical_remediation|safe }}
+                </div>
+                {% endif %}
+                
+                <!-- AI Metadata -->
+                {% if ai.model_used %}
+                <div class="ai-meta">
+                    Generated by <strong>{{ ai.model_used }}</strong> at {{ ai.generated_at }}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- FINDINGS TABLE -->
+            <div class="findings">
+                <h2>🔍 Security Findings ({{ findings|length }})</h2>
+                {% if findings %}
+                <table id="findings">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%">ID</th>
+                            <th style="width: 35%">Finding</th>
+                            <th style="width: 10%">Severity</th>
+                            <th style="width: 10%">Confidence</th>
+                            <th style="width: 35%">Recommendation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for finding in findings %}
+                        <tr>
+                            <td><code>{{ finding.id }}</code></td>
+                            <td>
+                                <strong>{{ finding.title }}</strong>
+                                {% if finding.description %}
+                                <p style="margin-top: 8px; font-size: 13px; color: var(--text-light);">
+                                    {{ finding.description }}
+                                </p>
+                                {% endif %}
+                                {% if finding.evidence %}
+                                <div class="evidence">
+                                    <strong>{{ finding.evidence.type }}:</strong> 
+                                    {{ finding.evidence.value }}
+                                    {% if finding.evidence.context %}
+                                    <br><small style="color: var(--text-light);">{{ finding.evidence.context }}</small>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="severity-badge severity-{{ finding.severity }}">
+                                    {{ finding.severity }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="confidence-badge">{{ finding.confidence }}</span>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px; line-height: 1.6;">
+                                    {{ finding.recommendation }}
+                                </div>
+                                {% if finding.references %}
+                                <div style="margin-top: 10px; font-size: 12px;">
+                                    <strong>References:</strong><br>
+                                    {% for ref in finding.references %}
+                                    <a href="{{ ref }}" target="_blank" style="color: var(--argus-purple); text-decoration: none;">
+                                        🔗 {{ ref|truncate(60) }}
+                                    </a><br>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p style="text-align: center; color: var(--text-light); padding: 3rem; font-size: 16px;">
+                    ✅ No security findings detected. Target appears secure.
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- NOTES -->
+            {% if notes %}
+            <div class="notes">
+                <h2>📝 Scan Notes</h2>
+                <table style="box-shadow: none; margin-top: 15px;">
+                    {% if notes.scan_duration_seconds %}
+                    <tr>
+                        <td style="width: 30%; font-weight: 600; border: none;">⏱️ Scan Duration</td>
+                        <td style="border: none;">{{ notes.scan_duration_seconds }} seconds</td>
+                    </tr>
+                    {% endif %}
+                    {% if notes.requests_sent %}
+                    <tr>
+                        <td style="font-weight: 600; border: none;">📡 HTTP Requests</td>
+                        <td style="border: none;">{{ notes.requests_sent }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if notes.scope_limitations %}
+                    <tr>
+                        <td style="font-weight: 600; border: none;">🔍 Scope</td>
+                        <td style="border: none;">{{ notes.scope_limitations }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if notes.false_positive_disclaimer %}
+                    <tr>
+                        <td style="font-weight: 600; border: none;">⚠️ Disclaimer</td>
+                        <td style="border: none;">{{ notes.false_positive_disclaimer }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <p><strong>Argus WordPress Security Scanner</strong> — All-Seeing Guardian 🛡️</p>
+            <p style="margin-top: 12px;">
+                Part of the <strong>Argos Security Suite</strong> | Generated on {{ date }}
+            </p>
+            <p style="margin-top: 20px; font-size: 12px; opacity: 0.8;">
+                © 2025 Rodney Dhavid Jimenez Chacin (rodhnin) — MIT License<br>
+                <a href="https://rodhnin.com" target="_blank">Contact: rodhnin.com</a> •
+                <a href="https://github.com/rodhnin/argus-wp-watcher" target="_blank">GitHub: argus-wp-watcher</a>
+            </p>
+            <p style="margin-top: 15px; font-size: 12px;">
+                ⚠️ Use only on authorized targets. This report is for informational and remediation purposes.
+            </p>
+        </footer>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        function showAiTab(tab) {
+            document.querySelectorAll('.ai-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ai-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        window.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                window.print();
+            }
+        });
+    </script>
+</body>
+</html>

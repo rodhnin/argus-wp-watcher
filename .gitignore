@@ -1,0 +1,137 @@
+# Argus - Git Ignore Patterns
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.manifest
+*.spec
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Argus specific
+# ===============
+
+# Reports directory (keep structure but not contents)
+reports/*.json
+reports/*.html
+reports/*.pdf
+!reports/.gitkeep
+
+# Database (SQLite)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Consent proofs (sensitive)
+consent-proofs/
+*.proof
+
+# Config files with secrets (DO NOT COMMIT)
+config/local.yaml
+config/production.yaml
+.env
+.env.local
+
+# Docker volumes data
+docker/data/
+docker/reports/
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+.cache/
+
+# Testing artifacts
+test_reports/
+test_output/
+vulnerable_wp_data/
+
+# AI API keys (never commit!)
+*.key
+api_keys.txt
+
+# Package manager
+poetry.lock
+Pipfile.lock
+
+# Documentation build
+docs/_build/
+docs/site/
+
+# Keep directory structure
+!.gitkeep

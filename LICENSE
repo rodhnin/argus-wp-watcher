@@ -1,0 +1,40 @@
+MIT License
+
+Copyright (c) 2025 Rodney Dhavid Jimenez Chacin (rodhnin)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+ETHICAL USE DISCLAIMER:
+
+This software is designed for authorized security testing and vulnerability
+assessment purposes only. Users must:
+
+1. Obtain explicit written permission before scanning any system
+2. Comply with all applicable laws and regulations
+3. Respect the consent token verification mechanism
+4. Use the tool responsibly and ethically
+5. Not use the tool for malicious purposes
+
+The author and contributors assume no liability for misuse of this software.
+Unauthorized access to computer systems is illegal and unethical.
+
+By using this software, you agree to use it only on systems you own or have
+explicit authorization to test.

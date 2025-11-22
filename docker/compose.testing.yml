@@ -1,0 +1,112 @@
+# Argus Testing Lab - WordPress Vulnerable Environment
+# WARNING: FOR TESTING ONLY - DO NOT EXPOSE TO PUBLIC INTERNET
+
+services:
+    # MariaDB Database
+    db:
+        image: mariadb:10.11
+        container_name: argus-test-db
+        restart: unless-stopped
+        environment:
+            MARIADB_ROOT_PASSWORD: test_root_password
+            MYSQL_ROOT_PASSWORD: test_root_password
+            MARIADB_DATABASE: wordpress_test
+            MYSQL_DATABASE: wordpress_test
+            MARIADB_USER: wp_test_user
+            MYSQL_USER: wp_test_user
+            MARIADB_PASSWORD: wp_test_pass
+            MYSQL_PASSWORD: wp_test_pass
+            MARIADB_INITDB_SKIP_TZINFO: "1"
+        volumes:
+            - db_data:/var/lib/mysql
+        networks:
+            - argus-test-network
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-ptest_root_password"]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 30s
+
+    # WordPress (intentionally vulnerable for testing)
+    wordpress:
+        image: wordpress:6.0
+        container_name: argus-test-wp
+        restart: unless-stopped
+        depends_on:
+            db:
+                condition: service_healthy
+        ports:
+            - "127.0.0.1:8080:80"
+        environment:
+            WORDPRESS_DB_HOST: db:3306
+            WORDPRESS_DB_USER: wp_test_user
+            WORDPRESS_DB_PASSWORD: wp_test_pass
+            WORDPRESS_DB_NAME: wordpress_test
+            WORDPRESS_DEBUG: "1"
+            WORDPRESS_CONFIG_EXTRA: |
+                define('WP_DEBUG', true);
+                define('WP_DEBUG_LOG', true);
+                define('WP_DEBUG_DISPLAY', true);
+                define('SCRIPT_DEBUG', true);
+                @ini_set('mysql.connect_timeout', 30);
+                @ini_set('default_socket_timeout', 30);
+            WP_CLI_ALLOW_ROOT: "1"
+        volumes:
+            - wordpress_data:/var/www/html
+            - ./vulnerable-setup:/docker-entrypoint-initwp.d:ro
+        networks:
+            - argus-test-network
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost/ || exit 1"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 60s
+
+volumes:
+    db_data:
+        name: argus-test-db-data
+    wordpress_data:
+        name: argus-test-wp-data
+
+networks:
+    argus-test-network:
+        name: argus-test-network
+        driver: bridge
+# ==============================================================================
+# USAGE INSTRUCTIONS
+# ==============================================================================
+#
+# 1. START THE LAB:
+#    docker compose -f compose.testing.yml up -d
+#
+# 2. WAIT FOR SERVICES (automated with healthchecks):
+#    docker compose -f compose.testing.yml ps
+#    (Wait until both show "healthy" status - takes ~60-90 seconds)
+#
+# 3. VERIFY WORDPRESS IS READY:
+#    curl http://localhost:8080
+#
+# 4. SCAN FROM HOST:
+#    python -m argus --target http://localhost:8080
+#
+# 5. SCAN FROM CONTAINER (if using deploy.sh option 3):
+#    docker compose exec argus python -m argus --target http://wordpress
+#
+# 6. STOP THE LAB:
+#    docker compose -f compose.testing.yml down
+#
+# 7. RESET THE LAB (delete all data):
+#    docker compose -f compose.testing.yml down -v
+#
+# ==============================================================================
+# SECURITY WARNING
+# ==============================================================================
+# This environment is INTENTIONALLY VULNERABLE for testing purposes.
+# - DO NOT expose to public internet (ports bound to 127.0.0.1 only)
+# - DO NOT use real credentials
+# - DO NOT store sensitive data
+# - Run in isolated VM or Docker network only
+# - Destroy after testing (docker compose -f compose.testing.yml down -v)
+# ==============================================================================

@@ -1,0 +1,45 @@
+# Argus - WordPress Security Scanner
+# Python 3.10+ required
+
+# HTTP Requests & Parsing
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+
+# DNS Resolution (for consent verification)
+dnspython>=2.4.0
+
+# Configuration & Templates
+PyYAML>=6.0.1
+Jinja2>=3.1.2
+
+# JSON Schema Validation
+jsonschema>=4.19.0
+
+# Terminal Colors (cross-platform)
+colorama>=0.4.6
+
+# Markdown Processing (for AI analysis in HTML reports)
+markdown>=3.5.0
+
+# AI Integration (LangChain)
+langchain-core==1.0.0
+langchain-community==0.4
+langchain-text-splitters==1.0.0
+langchain-openai==1.0.0
+langchain-anthropic==1.0.0
+langchain-ollama>=0.3.0,<0.4.0
+anthropic==0.71.0
+openai==2.5.0
+tiktoken==0.12.0
+
+# Development & Testing (optional)
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.0.0
+flake8>=6.1.0
+mypy>=1.5.0
+
+# Documentation (optional)
+mkdocs>=1.5.0
+mkdocs-material>=9.4.0

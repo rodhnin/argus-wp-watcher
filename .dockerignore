@@ -1,0 +1,51 @@
+# Version Control
+.git
+.gitignore
+.github/
+
+# Build & Distribution
+*.egg-info/
+dist/
+build/
+*.pyc
+__pycache__/
+*.egg
+
+# Development
+venv/
+env/
+.venv/
+.env
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+docs/
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE
+SECURITY.md
+
+# Tests
+tests/
+test_*.py
+
+# Misc
+*.log
+*.tmp
+node_modules/
+.pre-commit-config.yaml
