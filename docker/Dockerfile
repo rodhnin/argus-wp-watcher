@@ -45,7 +45,6 @@ COPY schema/ ./schema/
 COPY templates/ ./templates/
 COPY db/ ./db/
 COPY assets/ ./assets/
-COPY docs/ ./docs/
 
 # Create necessary directories
 RUN mkdir -p /reports /data && \
