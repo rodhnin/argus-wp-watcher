@@ -343,7 +343,7 @@ When contributing to a security tool:
 
 ## 📜 License
 
-By contributing to Asterion, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+By contributing to Argus, you agree that your contributions will be licensed under the [MIT License](LICENSE).
 
 ---
 
@@ -354,4 +354,4 @@ Part of the **Argos Security Suite**:
 -   🔥 [Hephaestus](https://github.com/rodhnin/hephaestus-server-forger) - Vulnerability Server Scanner
 -   🐂 [Asterion](https://github.com/rodhnin/asterion-network-minotaur) - Network Security Auditor
 -   🔮 [Pythia](https://github.com/rodhnin/pythia-sql-clairvoyance) - SQL Injection Detection Scanner
--   👁️ **Argus** - WordPress Security Scanner(this project)
+-   👁️ **Argus** - WordPress Security Scanner (this project)
