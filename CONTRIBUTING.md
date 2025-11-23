@@ -71,6 +71,12 @@ If you find a bug, please create an issue with:
 -   **Environment details** (OS, Python version, Argus version)
 -   **Logs or screenshots** if applicable
 
+**Security Vulnerabilities**
+
+**DO NOT** open public issues for security vulnerabilities!
+
+Contact me on [https://rodhnin.com](https://rodhnin.com).
+
 **Template**:
 
 ```markdown
@@ -321,27 +327,31 @@ When contributing to a security tool:
 
 -   **Never commit credentials** or API keys
 -   **Sanitize example outputs** in documentation
--   **Report security vulnerabilities** privately (see [SECURITY.md](SECURITY.md))
 -   **Consider rate limiting** for any new network operations
 -   **Validate user input** thoroughly
 -   **Document security implications** of new features
 
-## 🏆 Recognition
-
-Contributors will be recognized in:
-
--   **CHANGELOG.md** for notable contributions
--   **README.md** contributors section
--   **GitHub releases** notes
+---
 
 ## 📞 Questions?
 
--   **GitHub Discussions**: Ask questions and discuss ideas
--   **Issues**: Report bugs or request features
--   **Contact**: Visit [rodhnin.com](https://rodhnin.com) for direct contact
+-   **General questions**: Open a GitHub Discussion
+-   **Bug reports**: Open a GitHub Issue
+-   **Project maintainer**: [rodhnin](https://github.com/rodhnin) | [https://rodhnin.com](https://rodhnin.com)
 
 ---
 
-Thank you for contributing to Argus! Your efforts help make WordPress security testing more accessible and ethical for everyone.
+## 📜 License
 
-**Happy hacking! 🛡️**
+By contributing to Asterion, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+
+---
+
+**Thank you for helping make database security auditing more accessible!** 🛡️
+
+Part of the **Argos Security Suite**:
+
+-   🔥 [Hephaestus](https://github.com/rodhnin/hephaestus-server-forger) - Vulnerability Database Manager
+-   🐂 [Asterion](https://github.com/rodhnin/asterion-network-minotaur) - Network Security Auditor
+-   🔮 [Pythia](https://github.com/rodhnin/pythia-sql-clairvoyance) - SQL Injection Detection Scanner
+-   👁️ **Argus** - WordPress Security Scanner(this project)
