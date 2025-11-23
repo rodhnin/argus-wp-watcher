@@ -351,7 +351,7 @@ By contributing to Asterion, you agree that your contributions will be licensed 
 
 Part of the **Argos Security Suite**:
 
--   🔥 [Hephaestus](https://github.com/rodhnin/hephaestus-server-forger) - Vulnerability Database Manager
+-   🔥 [Hephaestus](https://github.com/rodhnin/hephaestus-server-forger) - Vulnerability Server Scanner
 -   🐂 [Asterion](https://github.com/rodhnin/asterion-network-minotaur) - Network Security Auditor
 -   🔮 [Pythia](https://github.com/rodhnin/pythia-sql-clairvoyance) - SQL Injection Detection Scanner
 -   👁️ **Argus** - WordPress Security Scanner(this project)
