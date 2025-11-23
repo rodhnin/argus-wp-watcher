@@ -347,7 +347,7 @@ By contributing to Asterion, you agree that your contributions will be licensed 
 
 ---
 
-**Thank you for helping make database security auditing more accessible!** 🛡️
+**Thank you for helping make WordPress security auditing more accessible!** 🛡️
 
 Part of the **Argos Security Suite**:
 
