@@ -1,82 +1,83 @@
 # Argus Development Roadmap
 
-## Current Version: v0.1.0 ✅ RELEASED
+## Current Version: v0.2.0 ✅ RELEASED
 
-**Release Date:** November 2025  
+**Release Date:** April 2026
+**Previous:** v0.1.0 (November 2025)
 **Status:** ✅ **PRODUCTION READY**
 
 ### Features Included
 
 #### Core Scanning
 
--   ✅ **WordPress Fingerprinting**: Multi-method version detection (meta tags, readme.html, RSS feeds, CSS/JS)
--   ✅ **Plugin Enumeration**: Concurrent scanning with wordlist-based detection (100+ common plugins)
--   ✅ **Theme Detection**: Active and inactive theme enumeration (20+ popular themes)
--   ✅ **Sensitive File Detection**: 70+ critical paths including:
-    -   Configuration backups (`wp-config.php.bak`, `.old`, `.save`, `~`)
-    -   Database dumps (`dump.sql`, `database.sql`, `backup.sql`)
-    -   Environment files (`.env`, `.git/`)
-    -   Debug logs (`wp-content/debug.log`)
--   ✅ **User Enumeration**: Three detection methods (Author IDOR, REST API, HTML parsing for WordPress 6.x+)
--   ✅ **Security Headers Analysis**: HSTS, CSP, X-Frame-Options, X-Content-Type-Options, and more
--   ✅ **Configuration Issues**: XML-RPC status, directory listing, debug mode, file editor access
+- ✅ **WordPress Fingerprinting**: Multi-method version detection (meta tags, readme.html, RSS feeds, CSS/JS)
+- ✅ **Plugin Enumeration**: Concurrent scanning with wordlist-based detection (100+ common plugins)
+- ✅ **Theme Detection**: Active and inactive theme enumeration (20+ popular themes)
+- ✅ **Sensitive File Detection**: 70+ critical paths including:
+    - Configuration backups (`wp-config.php.bak`, `.old`, `.save`, `~`)
+    - Database dumps (`dump.sql`, `database.sql`, `backup.sql`)
+    - Environment files (`.env`, `.git/`)
+    - Debug logs (`wp-content/debug.log`)
+- ✅ **User Enumeration**: Three detection methods (Author IDOR, REST API, HTML parsing for WordPress 6.x+)
+- ✅ **Security Headers Analysis**: HSTS, CSP, X-Frame-Options, X-Content-Type-Options, and more
+- ✅ **Configuration Issues**: XML-RPC status, directory listing, debug mode, file editor access
 
 #### Performance & Control
 
--   ✅ **Rate Limiting**: Configurable request throttling (1-20 req/s) with thread-safe implementation
--   ✅ **Thread Pool Management**: Concurrent scanning with 1-20 worker threads
--   ✅ **Intelligent Retry Logic**: Automatic retry on transient failures
--   ✅ **Graceful Degradation**: Continues scanning even if components fail
+- ✅ **Rate Limiting**: Configurable request throttling (1-20 req/s) with thread-safe implementation
+- ✅ **Thread Pool Management**: Concurrent scanning with 1-20 worker threads
+- ✅ **Intelligent Retry Logic**: Automatic retry on transient failures
+- ✅ **Graceful Degradation**: Continues scanning even if components fail
 
 #### Infrastructure
 
--   ✅ **Consent Token System**: Ethical scanning with HTTP/.well-known or DNS TXT verification
--   ✅ **SQLite Database**: Complete scan history, findings tracking, verified domain management
--   ✅ **Dual Reporting**: JSON (machine-readable) and HTML (human-readable) formats
--   ✅ **Professional HTML Reports**: Responsive, self-contained, 200+ KB with AI analysis
--   ✅ **Automatic Secret Redaction**: Logging system prevents credential leaks
--   ✅ **Multi-Source Configuration**: YAML defaults + environment variables + CLI overrides
--   ✅ **Docker Support**: Production-ready containerized scanning (379MB optimized image)
+- ✅ **Consent Token System**: Ethical scanning with HTTP/.well-known or DNS TXT verification
+- ✅ **SQLite Database**: Complete scan history, findings tracking, verified domain management
+- ✅ **Dual Reporting**: JSON (machine-readable) and HTML (human-readable) formats
+- ✅ **Professional HTML Reports**: Responsive, self-contained, 200+ KB with AI analysis
+- ✅ **Automatic Secret Redaction**: Logging system prevents credential leaks
+- ✅ **Multi-Source Configuration**: YAML defaults + environment variables + CLI overrides
+- ✅ **Docker Support**: Production-ready containerized scanning (379MB optimized image)
 
 #### AI-Powered Analysis (3 Providers)
 
--   ✅ **OpenAI GPT-4 Turbo**: Premium quality analysis (~35s, $0.25/scan)
--   ✅ **Anthropic Claude**: Privacy-focused alternative (~45s, $0.30/scan)
--   ✅ **Ollama (Local Models)**: 100% offline analysis (free, no data leaves your machine)
--   ✅ **Executive Summaries**: Business-friendly language for non-technical stakeholders
--   ✅ **Technical Remediation Guides**: Step-by-step instructions with commands and configuration
--   ✅ **Dual-Tone Mode**: Both executive and technical analysis in single report
--   ✅ **Automatic Sanitization**: Zero secrets leaked to AI providers
+- ✅ **OpenAI GPT-4 Turbo**: Premium quality analysis (~35s, $0.25/scan)
+- ✅ **Anthropic Claude**: Privacy-focused alternative (~45s, $0.30/scan)
+- ✅ **Ollama (Local Models)**: 100% offline analysis (free, no data leaves your machine)
+- ✅ **Executive Summaries**: Business-friendly language for non-technical stakeholders
+- ✅ **Technical Remediation Guides**: Step-by-step instructions with commands and configuration
+- ✅ **Dual-Tone Mode**: Both executive and technical analysis in single report
+- ✅ **Automatic Sanitization**: Zero secrets leaked to AI providers
 
 #### Resilience & Error Handling
 
--   ✅ **Connection Error Recovery**: Handles timeouts, DNS failures, refused connections
--   ✅ **Database Corruption Recovery**: Automatic backup and recreation
--   ✅ **Read-Only Mode**: Graceful degradation when database is locked
--   ✅ **Partial Scan Support**: Preserves results even if target goes offline mid-scan
--   ✅ **Standardized Exit Codes**: 0=success, 1=error, 2=not-wordpress, 130=cancelled
+- ✅ **Connection Error Recovery**: Handles timeouts, DNS failures, refused connections
+- ✅ **Database Corruption Recovery**: Automatic backup and recreation
+- ✅ **Read-Only Mode**: Graceful degradation when database is locked
+- ✅ **Partial Scan Support**: Preserves results even if target goes offline mid-scan
+- ✅ **Standardized Exit Codes**: 0=success, 1=error, 2=not-wordpress, 130=cancelled
 
 #### Developer Experience
 
--   ✅ **Rich CLI Interface**: Colored output, progress tracking, ASCII art branding
--   ✅ **Verbosity Levels**: `-v` (INFO), `-vv` (DEBUG) for troubleshooting
--   ✅ **Comprehensive Help**: Built-in documentation with examples
--   ✅ **Flexible Deployment**: Native Python, Docker, or containerized scanning
+- ✅ **Rich CLI Interface**: Colored output, progress tracking, ASCII art branding
+- ✅ **Verbosity Levels**: `-v` (INFO), `-vv` (DEBUG) for troubleshooting
+- ✅ **Comprehensive Help**: Built-in documentation with examples
+- ✅ **Flexible Deployment**: Native Python, Docker, or containerized scanning
 
 ### Performance Benchmarks (v0.1.0)
 
--   **Scan Duration**: 6-42 seconds (depending on configuration)
--   **Database Efficiency**: 2.0 MB for 5,000+ findings
--   **Query Performance**: 5-50ms for complex aggregations
--   **Concurrent Scanning**: 3+ simultaneous scans without race conditions
--   **Scalability**: Tested up to 1,000+ scans with linear performance
+- **Scan Duration**: 6-42 seconds (depending on configuration)
+- **Database Efficiency**: 2.0 MB for 5,000+ findings
+- **Query Performance**: 5-50ms for complex aggregations
+- **Concurrent Scanning**: 3+ simultaneous scans without race conditions
+- **Scalability**: Tested up to 1,000+ scans with linear performance
 
 ---
 
-## v0.2.0 - Enhanced Detection & AI Features
+## v0.2.0 - Enhanced Detection & AI Features ✅ RELEASED
 
-**Theme:** Deep Vulnerability Analysis + Advanced AI Capabilities  
-**Target Release:** Q2 2026 (April-May)  
+**Theme:** Deep Vulnerability Analysis + Advanced AI Capabilities
+**Release Date:** May 2026
 **Focus:** Detection accuracy, AI enhancements, reporting improvements
 
 ---
@@ -88,11 +89,11 @@
 
 #### Current Limitations
 
--   No CVE/CWE mapping for detected plugins
--   References lack metadata (title, domain, type)
--   Security headers shown without configuration examples
--   Recommendations are truncated
--   No grouping or filtering by category/severity
+- No CVE/CWE mapping for detected plugins
+- References lack metadata (title, domain, type)
+- Security headers shown without configuration examples
+- Recommendations are truncated
+- No grouping or filtering by category/severity
 
 #### Planned Improvements
 
@@ -177,10 +178,10 @@
 
 **Benefits:**
 
--   Actionable insights (copy-paste configuration snippets)
--   Clear vulnerability correlation (CVE/CWE mapping)
--   Better organization (filtering and grouping)
--   Enhanced credibility (reference metadata)
+- Actionable insights (copy-paste configuration snippets)
+- Clear vulnerability correlation (CVE/CWE mapping)
+- Better organization (filtering and grouping)
+- Enhanced credibility (reference metadata)
 
 ---
 
@@ -285,19 +286,19 @@ GET /wp-content/plugins/contact-form-7/.svn/entries
 
 #### Additional Features
 
--   **Inactive Plugin Detection**: Find plugins in `/wp-content/plugins/` not active
--   **Must-Use Plugins**: Check `/wp-content/mu-plugins/`
--   **Drop-ins**: Detect custom `db.php`, `advanced-cache.php`, etc.
--   **Custom Wordlists**: Import from WPScan, SecLists, or user-provided lists
+- **Inactive Plugin Detection**: Find plugins in `/wp-content/plugins/` not active
+- **Must-Use Plugins**: Check `/wp-content/mu-plugins/`
+- **Drop-ins**: Detect custom `db.php`, `advanced-cache.php`, etc.
+- **Custom Wordlists**: Import from WPScan, SecLists, or user-provided lists
 
 **Target Accuracy:** ≥70% version detection rate
 
 **Benefits:**
 
--   Transform "info" findings into "critical" vulnerabilities
--   Enable CVE correlation
--   Prioritize patching efforts
--   Reduce false negatives
+- Transform "info" findings into "critical" vulnerabilities
+- Enable CVE correlation
+- Prioritize patching efforts
+- Reduce false negatives
 
 ---
 
@@ -310,9 +311,9 @@ GET /wp-content/plugins/contact-form-7/.svn/entries
 
 Aggressive mode only differs in rate limiting:
 
--   Safe mode: 5 req/s, 5 threads
--   Aggressive mode: 10 req/s, 10 threads
--   **Same 99 findings** (no additional checks)
+- Safe mode: 5 req/s, 5 threads
+- Aggressive mode: 10 req/s, 10 threads
+- **Same 99 findings** (no additional checks)
 
 #### Planned Enhancements
 
@@ -442,10 +443,10 @@ def check_sensitive_files(aggressive=False):
 
 **Benefits:**
 
--   Real value differentiation between modes
--   Deeper coverage for penetration testing
--   Configurable aggression levels
--   Respects consent requirements
+- Real value differentiation between modes
+- Deeper coverage for penetration testing
+- Configurable aggression levels
+- Respects consent requirements
 
 ---
 
@@ -498,7 +499,7 @@ python -m argus --target example.com --use-ai --ai-tone both
             "scan_id": 45,
             "timestamp": "2025-10-19T18:52:43Z",
             "provider": "openai",
-            "model": "gpt-4-turbo-preview",
+            "model": "gpt-4o-mini-2024-07-18",
             "executive_summary": {
                 "tokens_input": 1500,
                 "tokens_output": 1250,
@@ -554,10 +555,10 @@ argus costs export --format csv --output costs.csv
 
 **Benefits:**
 
--   Cost transparency (know exactly what you spend)
--   Budget enforcement (prevent surprise bills)
--   Monthly projections (plan AI usage)
--   Enterprise compliance (required for procurement)
+- Cost transparency (know exactly what you spend)
+- Budget enforcement (prevent surprise bills)
+- Monthly projections (plan AI usage)
+- Enterprise compliance (required for procurement)
 
 ---
 
@@ -603,10 +604,10 @@ for chunk in chain:
 
 #### Benefits
 
--   **Improved UX**: See progress instead of blank screen
--   **Reduced Perceived Latency**: 30s feels faster when you see output
--   **Better for Slow Models**: Critical for Ollama (28 min → see progress)
--   **Error Detection**: Know immediately if AI stalls
+- **Improved UX**: See progress instead of blank screen
+- **Reduced Perceived Latency**: 30s feels faster when you see output
+- **Better for Slow Models**: Critical for Ollama (28 min → see progress)
+- **Error Detection**: Know immediately if AI stalls
 
 **Trade-off:** Slightly more complex code (async handling)
 
@@ -630,7 +631,7 @@ ai:
         enabled: true
         models:
             - provider: openai
-              model: gpt-4-turbo-preview
+              model: gpt-4o-mini-2024-07-18
               weight: 0.5 # 50% weight in consensus
 
             - provider: anthropic
@@ -712,16 +713,16 @@ def generate_consensus(responses):
 
 **Benefits:**
 
--   **Quality Assurance**: Cross-validation between models
--   **Reduced Hallucinations**: 30-40% fewer false statements
--   **Confidence Scoring**: Know when models agree/disagree
--   **Best of All Worlds**: GPT-4 speed + Claude safety + Llama privacy
+- **Quality Assurance**: Cross-validation between models
+- **Reduced Hallucinations**: 30-40% fewer false statements
+- **Confidence Scoring**: Know when models agree/disagree
+- **Best of All Worlds**: GPT-4 speed + Claude safety + Llama privacy
 
 **Trade-offs:**
 
--   Higher cost (3x API calls)
--   Longer duration (~2-3 minutes)
--   Complexity (managing multiple responses)
+- Higher cost (3x API calls)
+- Longer duration (~2-3 minutes)
+- Complexity (managing multiple responses)
 
 ---
 
@@ -867,37 +868,43 @@ This vulnerability was added to WPScan database on 2023-09-15."
 
 **Benefits:**
 
--   **Real-time Vulnerability Correlation**: No manual CVE lookup
--   **Contextual Analysis**: Connects findings across scans
--   **Automated Research**: Agent does the investigation work
--   **Foundation for v0.3.0**: Enables interactive chat features
+- **Real-time Vulnerability Correlation**: No manual CVE lookup
+- **Contextual Analysis**: Connects findings across scans
+- **Automated Research**: Agent does the investigation work
+- **Foundation for v0.3.0**: Enables interactive chat features
 
 ---
 
 ### 📚 Additional v0.2.0 Features
 
-#### WPScan API Integration
+#### Vulnerability API Integration ✅ COMPLETE
 
--   Vulnerability database correlation
--   CVE matching for detected plugins/themes/core
--   Automatic exploit availability checking
--   Known vulnerability severity mapping
+- ✅ CVE matching for detected plugins/themes/core (WPVulnerability.net — free, no key)
+- ✅ Latest stable version lookup (WordPress.org API)
+- ✅ CVSS scoring per vulnerability (NVD API)
+- ✅ CWE mapping per vulnerability
+- ✅ Known vulnerability severity mapping (CWE + keyword heuristics)
+- ❌ Exploit availability checking — deferred to v0.3.0 (requires WPScan API key or ExploitDB)
 
-#### Advanced Crawling
+#### Advanced Crawling ✅ COMPLETE
 
--   Spider mode: `--crawl` flag
--   Configurable depth: `--max-depth 3`
--   Same-domain restriction
--   Sitemap.xml and robots.txt parsing
--   Link extraction and form discovery
+- ✅ Sitemap.xml and robots.txt parsing (ARGUS-WP-080/081)
+- ✅ HTML comments discovery (ARGUS-WP-082)
+- ✅ Link extraction depth 1-2 (ARGUS-WP-083)
+- ✅ Same-domain restriction
+- ✅ Aggressive mode only (intentional — crawling requires consent)
+- ❌ `--crawl` flag / `--max-depth N` — not needed (crawl is baked into aggressive mode by design)
+- ❌ Form discovery — deferred to v0.3.0 (WordPress forms are standardized; limited security value)
 
-#### Improved Reporting
+#### Improved Reporting ✅ COMPLETE
 
--   PDF export with custom branding
--   CVSS scoring for vulnerabilities
--   Compliance mapping (OWASP Top 10, CWE)
--   Trend graphs (security posture over time)
--   Diff reports (compare two scans)
+- ✅ CVSS scoring for vulnerabilities (NVD API, color-coded badge in HTML: red/orange/yellow/green)
+- ✅ Latest version badges in HTML report (WordPress.org API, green "vX.Y.Z" badge per vulnerable finding)
+- ✅ OWASP Top 10 2021 compliance mapping — `argus/core/owasp.py`, purple badge per finding linking to owasp.org, full JSON schema support
+- ✅ Diff reports (`--diff SCAN_ID` / `--diff last`) — `argus/core/diff.py`, new/fixed/persisting categorization, mode mismatch warning, schema + HTML section
+- ✅ Vulnerability title deduplication fix — `_pick_best_title()` using WPScan UUID-source advisories
+- ❌ PDF export with custom branding — deferred to v0.3.0
+- ❌ Trend graphs (security posture over time) — deferred to v0.3.0
 
 **Breaking Changes:** None (fully backward compatible)
 
@@ -905,9 +912,22 @@ This vulnerability was added to WPScan database on 2023-09-15."
 
 ## v0.3.0 - Enterprise & Interactive Features
 
-**Theme:** Scale, Automation, and Conversational AI  
-**Target Release:** Q3 2026 (July-August)  
+**Theme:** Scale, Automation, and Conversational AI
+**Target Release:** Q3 2026 (July-August)
 **Focus:** Enterprise needs, multi-site scanning, interactive AI
+
+---
+
+### 📊 Advanced Reporting
+
+**Priority:** Medium
+
+Features deferred from v0.2.0 plus new reporting capabilities:
+
+- **PDF export with custom branding** — professional client-ready reports (weasyprint/pdfkit)
+- **Trend graphs** — security posture over time using SQLite scan history (Chart.js embedded)
+- **Exploit availability** — ExploitDB / WPScan API integration for `exploit_available` field
+- **Form discovery** — crawl-based form endpoint detection for CSRF/injection surface mapping
 
 ---
 
@@ -1039,16 +1059,16 @@ settings:
   ai:
     enabled: true
     provider: openai
-    model: gpt-4-turbo-preview
+    model: gpt-4o-mini-2024-07-18
 ```
 
 **Benefits:**
 
--   **No YAML editing**: User-friendly CLI interface
--   **Real-time validation**: Instant feedback on invalid values
--   **Reusable profiles**: Save configurations for different scenarios
--   **Team collaboration**: Share profiles as files
--   **Runtime switching**: Change AI provider without restart
+- **No YAML editing**: User-friendly CLI interface
+- **Real-time validation**: Instant feedback on invalid values
+- **Reusable profiles**: Save configurations for different scenarios
+- **Team collaboration**: Share profiles as files
+- **Runtime switching**: Change AI provider without restart
 
 ---
 
@@ -1247,10 +1267,10 @@ $ argus db check
 
 **Benefits:**
 
--   **No SQL knowledge required**: User-friendly commands
--   **Rapid auditing**: Quickly find critical findings
--   **Automation-friendly**: Machine-readable output
--   **Consistent validation**: Built-in data integrity checks
+- **No SQL knowledge required**: User-friendly commands
+- **Rapid auditing**: Quickly find critical findings
+- **Automation-friendly**: Machine-readable output
+- **Consistent validation**: Built-in data integrity checks
 
 ---
 
@@ -1292,11 +1312,11 @@ AI: Yes, CVE-2023-4734 has a public exploit (ExploitDB #51234).
 
 **Features:**
 
--   Natural language queries
--   Multi-turn dialogue with context
--   Scan comparison and diff analysis
--   Step-by-step remediation guidance
--   Integration with WPScan, CVE, ExploitDB tools
+- Natural language queries
+- Multi-turn dialogue with context
+- Scan comparison and diff analysis
+- Step-by-step remediation guidance
+- Integration with WPScan, CVE, ExploitDB tools
 
 ---
 
@@ -1304,27 +1324,27 @@ AI: Yes, CVE-2023-4734 has a public exploit (ExploitDB #51234).
 
 #### Multi-Site Scanning
 
--   Batch scanning: `--targets-file urls.txt`
--   Network-wide scanning (WordPress Multisite)
--   Aggregate reports across multiple sites
--   Parallel scanning with queue management
+- Batch scanning: `--targets-file urls.txt`
+- Network-wide scanning (WordPress Multisite)
+- Aggregate reports across multiple sites
+- Parallel scanning with queue management
 
 #### CI/CD Integration
 
--   Jenkins plugin/script examples
--   GitHub Actions workflow templates
--   GitLab CI templates
--   Exit codes for CI (fail on severity threshold)
--   JUnit XML output for test reporting
+- Jenkins plugin/script examples
+- GitHub Actions workflow templates
+- GitLab CI templates
+- Exit codes for CI (fail on severity threshold)
+- JUnit XML output for test reporting
 
 #### REST API Server
 
--   FastAPI-based REST API
--   Async scan triggering
--   Webhook notifications
--   Multi-user authentication
--   Rate limiting per user
--   OpenAPI/Swagger documentation
+- FastAPI-based REST API
+- Async scan triggering
+- Webhook notifications
+- Multi-user authentication
+- Rate limiting per user
+- OpenAPI/Swagger documentation
 
 **Breaking Changes:** Database schema v2 (auto-migration provided)  
 **Migration:** `argus db migrate` (automatic on first run)
@@ -1341,32 +1361,32 @@ AI: Yes, CVE-2023-4734 has a public exploit (ExploitDB #51234).
 
 #### Automated Remediation
 
--   WP-CLI integration for automated fixes
--   Safe auto-patching with approval workflow
--   Playbook system (YAML-defined fix sequences)
--   Dry-run mode (simulate fixes without applying)
--   Rollback capability (undo applied fixes)
+- WP-CLI integration for automated fixes
+- Safe auto-patching with approval workflow
+- Playbook system (YAML-defined fix sequences)
+- Dry-run mode (simulate fixes without applying)
+- Rollback capability (undo applied fixes)
 
 #### ML-Based Detection
 
--   Anomaly detection (unusual patterns in WordPress installations)
--   False positive reduction (learn from user feedback)
--   Behavioral analysis (detect suspicious code patterns)
--   Custom model training on your historical data
+- Anomaly detection (unusual patterns in WordPress installations)
+- False positive reduction (learn from user feedback)
+- Behavioral analysis (detect suspicious code patterns)
+- Custom model training on your historical data
 
 #### Advanced AI Capabilities
 
--   Agent autonomy (AI plans and executes scan strategies)
--   Exploit generation (proof-of-concept code for findings)
--   Custom remediation scripts (AI-generated shell scripts)
--   Natural language queries ("What's most urgent?")
+- Agent autonomy (AI plans and executes scan strategies)
+- Exploit generation (proof-of-concept code for findings)
+- Custom remediation scripts (AI-generated shell scripts)
+- Natural language queries ("What's most urgent?")
 
 #### Performance Enhancements
 
--   Distributed scanning (worker nodes for load distribution)
--   Redis cache for common checks
--   Optimized request batching
--   GPU acceleration for ML models
+- Distributed scanning (worker nodes for load distribution)
+- Redis cache for common checks
+- Optimized request batching
+- GPU acceleration for ML models
 
 **Breaking Changes:** Configuration schema v2 (backward compatible with v1)  
 **Migration:** Automatic upgrade with deprecation warnings
@@ -1403,9 +1423,9 @@ Argus development is guided by these core principles:
 
 ### Commitments
 
--   ✅ **Quarterly feature releases** with new capabilities
--   ✅ **Open development** with public roadmap
--   ✅ **Responsive support** on GitHub (48h response)
+- ✅ **Quarterly feature releases** with new capabilities
+- ✅ **Open development** with public roadmap
+- ✅ **Responsive support** on GitHub (48h response)
 
 ---
 
@@ -1422,5 +1442,5 @@ Consider Pro Track (custom development available) or sponsor the project
 
 ---
 
-_Last updated: November 22, 2025_  
-_Roadmap version: 1.0 (v0.1.0)_
+_Last updated: May 2026_
+_Roadmap version: 2.0 (v0.2.0)_

@@ -29,17 +29,20 @@ is_valid = generator.validate_report(report)  # True/False
 ```json
 {
   "tool": "argus",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "target": "https://example-wp-site.com",
-  "date": "2025-10-11T18:45:30Z",
+  "date": "2026-03-14T10:31:45Z",
   "mode": "safe",
   "summary": {...},
   "findings": [...],
   "notes": {...},
   "consent": {...},
-  "ai_analysis": {...}
+  "ai_analysis": {...},
+  "diff": {...}
 }
 ```
+
+> `diff` is optional — only present when `--diff SCAN_ID` is used.
 
 ---
 
@@ -49,42 +52,42 @@ is_valid = generator.validate_report(report)  # True/False
 
 #### `tool` (string)
 
--   **Value**: `"argus"`
--   **Purpose**: Identifies the WordPress security scanner
--   **Example**: `"argus"`
+- **Value**: `"argus"`
+- **Purpose**: Identifies the WordPress security scanner
+- **Example**: `"argus"`
 
 #### `version` (string)
 
--   **Format**: Semantic versioning (X.Y.Z)
--   **Purpose**: Tool version for compatibility tracking
--   **Example**: `"0.1.0"`
+- **Format**: Semantic versioning (X.Y.Z)
+- **Purpose**: Tool version for compatibility tracking
+- **Example**: `"0.2.0"`
 
 #### `target` (string)
 
--   **Format**: Full URL or domain
--   **Purpose**: Scanned WordPress site identifier
--   **Examples**:
-    -   `"https://example-wp-site.com"`
-    -   `"https://blog.example.com"`
-    -   `"http://192.168.1.100/wordpress"`
+- **Format**: Full URL or domain
+- **Purpose**: Scanned WordPress site identifier
+- **Examples**:
+    - `"https://example-wp-site.com"`
+    - `"https://blog.example.com"`
+    - `"http://192.168.1.100/wordpress"`
 
 #### `date` (string)
 
--   **Format**: ISO 8601 (UTC with Z suffix)
--   **Purpose**: Scan completion timestamp
--   **Example**: `"2025-10-11T18:45:30Z"`
+- **Format**: ISO 8601 (UTC with Z suffix)
+- **Purpose**: Scan completion timestamp
+- **Example**: `"2025-10-11T18:45:30Z"`
 
 #### `mode` (string)
 
--   **Values**: `"safe"` or `"aggressive"`
--   **Purpose**: Scan depth indicator
--   **Example**: `"safe"`
+- **Values**: `"safe"` or `"aggressive"`
+- **Purpose**: Scan depth indicator
+- **Example**: `"safe"`
 
 #### `summary` (object)
 
--   **Purpose**: Quick overview of findings by severity
--   **Required keys**: `critical`, `high`, `medium`, `low`, `info`
--   **All values**: Non-negative integers
+- **Purpose**: Quick overview of findings by severity
+- **Required keys**: `critical`, `high`, `medium`, `low`, `info`
+- **All values**: Non-negative integers
 
 ```json
 "summary": {
@@ -98,8 +101,8 @@ is_valid = generator.validate_report(report)  # True/False
 
 #### `findings` (array)
 
--   **Purpose**: Detailed list of WordPress security issues
--   **Items**: Finding objects (see below)
+- **Purpose**: Detailed list of WordPress security issues
+- **Items**: Finding objects (see below)
 
 ---
 
@@ -165,18 +168,21 @@ Each finding in the `findings` array:
 
 #### Finding Fields
 
-| Field                | Required | Type   | Description                                           |
-| -------------------- | -------- | ------ | ----------------------------------------------------- |
-| `id`                 | ✅ Yes   | string | Unique finding identifier (e.g., `ARGUS-WP-030`)      |
-| `title`              | ✅ Yes   | string | Short, descriptive title (max 200 chars)              |
-| `description`        | ❌ No    | string | Detailed vulnerability explanation                    |
-| `severity`           | ✅ Yes   | enum   | `critical` \| `high` \| `medium` \| `low` \| `info`   |
-| `confidence`         | ✅ Yes   | enum   | `high` \| `medium` \| `low`                           |
-| `evidence`           | ❌ No    | object | Proof of vulnerability                                |
-| `recommendation`     | ✅ Yes   | string | Actionable remediation guidance                       |
-| `references`         | ❌ No    | array  | External links (WordPress docs, OWASP, CVE databases) |
-| `cve`                | ❌ No    | array  | CVE identifiers (format: `CVE-YYYY-NNNNN`)            |
-| `affected_component` | ❌ No    | string | Specific component (plugin name, theme, file path)    |
+| Field                | Required | Type   | Description                                                                                                                                 |
+| -------------------- | -------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                 | ✅ Yes   | string | Unique finding identifier (e.g., `ARGUS-WP-030`)                                                                                            |
+| `title`              | ✅ Yes   | string | Short, descriptive title (max 200 chars)                                                                                                    |
+| `description`        | ❌ No    | string | Detailed vulnerability explanation                                                                                                          |
+| `severity`           | ✅ Yes   | enum   | `critical` \| `high` \| `medium` \| `low` \| `info`                                                                                         |
+| `confidence`         | ✅ Yes   | enum   | `high` \| `medium` \| `low`                                                                                                                 |
+| `evidence`           | ❌ No    | object | Proof of vulnerability                                                                                                                      |
+| `recommendation`     | ✅ Yes   | string | Actionable remediation guidance                                                                                                             |
+| `references`         | ❌ No    | array  | External links (WordPress docs, OWASP, CVE databases)                                                                                       |
+| `cve`                | ❌ No    | array  | CVE identifiers (format: `CVE-YYYY-NNNNN`)                                                                                                  |
+| `affected_component` | ❌ No    | string | Specific component (plugin name, theme, file path)                                                                                          |
+| `latest_version`     | ❌ No    | string | Latest stable version from WordPress.org API (v0.2.0+)                                                                                      |
+| `owasp`              | ❌ No    | object | OWASP Top 10 2021 mapping: `{"id": "A06", "name": "Vulnerable and Outdated Components"}` (v0.2.0+)                                          |
+| `vulnerabilities`    | ❌ No    | array  | Detailed CVE records from WPVulnerability.net with `title`, `cve_id`, `cvss`, `cwe_id`, `cwe_name`, `description`, `link`, `date` (v0.2.0+) |
 
 ---
 
@@ -208,16 +214,17 @@ Each finding in the `findings` array:
 
 ### Category Ranges
 
-| ID Range           | Category         | Description                                                      |
-| ------------------ | ---------------- | ---------------------------------------------------------------- |
-| `ARGUS-WP-000-009` | WordPress Core   | Installation detection, version disclosure, core vulnerabilities |
-| `ARGUS-WP-010-019` | Plugins          | Plugin detection, vulnerable plugins, plugin-specific issues     |
-| `ARGUS-WP-020-029` | Themes           | Theme detection, theme vulnerabilities                           |
-| `ARGUS-WP-030-039` | Sensitive Files  | Exposed configs, backups, debug files                            |
-| `ARGUS-WP-040-049` | User Enumeration | Username discovery, author archives, REST API                    |
-| `ARGUS-WP-050-059` | Security Headers | Missing headers (HSTS, CSP, X-Frame-Options)                     |
-| `ARGUS-WP-060-069` | Config Issues    | XML-RPC, directory listing, debug mode                           |
-| `ARGUS-WP-070-099` | Custom Findings  | Site-specific issues                                             |
+| ID Range           | Category         | Description                                                                    |
+| ------------------ | ---------------- | ------------------------------------------------------------------------------ |
+| `ARGUS-WP-000-009` | WordPress Core   | Installation detection, version disclosure, core vulnerabilities               |
+| `ARGUS-WP-010-019` | Plugins          | Plugin detection, vulnerable plugins, plugin-specific issues                   |
+| `ARGUS-WP-020-029` | Themes           | Theme detection, theme vulnerabilities                                         |
+| `ARGUS-WP-030-039` | Sensitive Files  | Exposed configs, backups, debug files                                          |
+| `ARGUS-WP-040-049` | User Enumeration | Username discovery, author archives, REST API                                  |
+| `ARGUS-WP-050-059` | Security Headers | Missing headers (HSTS, CSP, X-Frame-Options)                                   |
+| `ARGUS-WP-060-069` | Config Issues    | XML-RPC, directory listing, debug mode                                         |
+| `ARGUS-WP-070-079` | Login Security   | Login page, 2FA, CAPTCHA, brute force, registration (v0.2.0+, aggressive only) |
+| `ARGUS-WP-080-089` | Web Crawl        | robots.txt, sitemap, HTML comments, link discovery (v0.2.0+, aggressive only)  |
 
 ### Common Finding IDs
 
@@ -314,6 +321,54 @@ Each finding in the `findings` array:
 
 ---
 
+## 📈 Diff Object (v0.2.0+)
+
+The optional `diff` top-level field is added when `--diff SCAN_ID` (or `--diff last`) is used. It compares the current scan against a previous scan stored in the database.
+
+```json
+{
+    "diff": {
+        "ref_scan_id": 29,
+        "ref_date": "2026-03-14 10:10:07",
+        "ref_target": "http://localhost:8080",
+        "ref_mode": "safe",
+        "current_mode": "aggressive",
+        "mode_mismatch": true,
+        "new": [
+            { "id": "ARGUS-WP-073", "title": "No brute force protection detected", "severity": "high" },
+            { "id": "ARGUS-WP-080", "title": "robots.txt discloses 3 sensitive path(s)", "severity": "low" }
+        ],
+        "fixed": [],
+        "persisting": [
+            { "id": "ARGUS-WP-001", "title": "Vulnerable WordPress core: 6.0.3 + 12 CVE(s)", "severity": "critical" }
+        ]
+    }
+}
+```
+
+| Field           | Description                                                                                  |
+| --------------- | -------------------------------------------------------------------------------------------- |
+| `ref_scan_id`   | Scan ID used as the reference baseline                                                       |
+| `ref_date`      | Timestamp of the reference scan                                                              |
+| `ref_mode`      | Scan mode of the reference scan (`safe` or `aggressive`)                                     |
+| `current_mode`  | Scan mode of the current scan                                                                |
+| `mode_mismatch` | `true` when modes differ — some "fixed" findings may just not be checked in the current mode |
+| `new`           | Findings present in this scan but not in the reference                                       |
+| `fixed`         | Findings present in the reference but absent in this scan                                    |
+| `persisting`    | Findings present in both scans                                                               |
+
+**CLI usage:**
+
+```bash
+# Compare against the most recent prior scan for the same target
+python -m argus --target https://example.com --diff last --html
+
+# Compare against a specific scan ID
+python -m argus --target https://example.com --diff 42 --html
+```
+
+---
+
 ## 📊 Complete Example Reports
 
 ### Minimal Valid Report
@@ -321,7 +376,7 @@ Each finding in the `findings` array:
 ```json
 {
     "tool": "argus",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "target": "https://example.com",
     "date": "2025-10-11T18:45:30Z",
     "mode": "safe",
@@ -360,7 +415,7 @@ Each finding in the `findings` array:
 ````json
 {
     "tool": "argus",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "target": "https://example-wp-site.com",
     "date": "2025-10-11T18:45:30Z",
     "mode": "aggressive",
@@ -549,7 +604,49 @@ Each finding in the `findings` array:
         "executive_summary": "Your WordPress site has a **MODERATE** security posture with 1 critical issue requiring immediate attention.\n\n**Key Risks:**\n- **Exposed Configuration Backup:** A wp-config.php backup file is publicly accessible, containing database credentials and security keys. This is like leaving a copy of your safe combination on the front porch.\n- **Outdated Plugin:** Contact Form 7 version 5.3 has a known XSS vulnerability (CVE-2020-35489). Automated tools can easily exploit this.\n- **User Enumeration:** The admin username is publicly discoverable, making brute force attacks much easier.\n\n**Immediate Actions:**\n1. Delete wp-config.php.bak immediately (URGENT - within 1 hour)\n2. Update Contact Form 7 to latest version (within 24 hours)\n3. Change admin username or implement 2FA (within 1 week)",
         "technical_remediation": "## Critical Actions (Within 24 Hours)\n\n### 1. Remove Exposed Configuration File\n```bash\n# SSH into your server\nssh user@yourserver.com\n\n# Locate and remove backup file\ncd /var/www/html\nrm wp-config.php.bak\n\n# Verify removal\nls -la wp-config*\n```\n\n### 2. Change Database Credentials\n```bash\n# Generate new password\nopenssl rand -base64 32\n\n# Update wp-config.php with new credentials\nnano wp-config.php\n# Update DB_PASSWORD line\n\n# Update database user password\nmysql -u root -p\nALTER USER 'wp_user'@'localhost' IDENTIFIED BY 'new_password';\nFLUSH PRIVILEGES;\n```\n\n### 3. Regenerate Security Keys\nVisit https://api.wordpress.org/secret-key/1.1/salt/\nReplace all keys in wp-config.php\n\n## High Priority (Within 1 Week)\n\n### Update Vulnerable Plugin\n```bash\n# Via WP-CLI\nwp plugin update contact-form-7\n\n# Or via WordPress Admin\n# Dashboard > Plugins > Update Now\n```\n\n### Mitigate User Enumeration\n```php\n// Add to functions.php or security plugin\nfunction disable_author_archives() {\n    if (is_author()) {\n        wp_redirect(home_url());\n        exit;\n    }\n}\nadd_action('template_redirect', 'disable_author_archives');\n```\n\n## Medium Priority (Within 2 Weeks)\n\n### Disable XML-RPC\n```apache\n# Add to .htaccess\n<Files xmlrpc.php>\n  Order Deny,Allow\n  Deny from all\n</Files>\n```\n\n### Fix Directory Listing\n```apache\n# Add to .htaccess\nOptions -Indexes\n```\n\n### Add Security Headers\n```apache\n# Add to .htaccess\n<IfModule mod_headers.c>\n  Header set Strict-Transport-Security \"max-age=31536000; includeSubDomains; preload\"\n  Header set X-Frame-Options \"DENY\"\n  Header set X-Content-Type-Options \"nosniff\"\n  Header set Content-Security-Policy \"default-src 'self'\"\n</IfModule>\n```",
         "generated_at": "2025-10-11T18:45:35Z",
-        "model_used": "gpt-4-turbo-preview"
+        "model_used": "openai/gpt-4o-mini-2024-07-18",
+        "cost": {
+            "total_usd": 0.006327,
+            "provider": "openai",
+            "model": "gpt-4o-mini-2024-07-18",
+            "breakdown": {
+                "non_technical": {"input_tokens": 16496, "output_tokens": 706, "cost_usd": 0.002898, "duration_s": 37.57},
+                "technical":     {"input_tokens": 16290, "output_tokens": 1642, "cost_usd": 0.003429, "duration_s": 69.32}
+            }
+        }
+    }
+}
+```
+
+**Agent mode output** (`--ai-agent`):
+```json
+{
+    "ai_analysis": {
+        "agent_analysis": "### Executive Summary\n...(enriched with NVD CVSS scores and WPVulnerability.net data)...",
+        "generated_at": "2026-03-13T18:05:00Z",
+        "model_used": "openai/gpt-4o-mini-2024-07-18",
+        "cost": {"total_usd": 0.0026, "provider": "openai", "model": "gpt-4o-mini-2024-07-18"}
+    }
+}
+```
+
+**Compare mode output** (`--ai-compare`):
+```json
+{
+    "ai_analysis": {
+        "comparison_mode": true,
+        "providers_compared": ["openai/gpt-4o-mini-2024-07-18", "anthropic/claude-3-5-haiku-20241022"],
+        "results": {
+            "openai/gpt-4o-mini-2024-07-18": {"executive_summary": "...", "technical_remediation": "..."},
+            "anthropic/claude-3-5-haiku-20241022": {"executive_summary": "...", "technical_remediation": "..."}
+        },
+        "cost_by_provider": {
+            "openai/gpt-4o-mini-2024-07-18": 0.006,
+            "anthropic/claude-3-5-haiku-20241022": 0.018
+        },
+        "generated_at": "2026-03-13T18:05:00Z",
+        "model_used": "gpt-4o-mini-2024-07-18,claude-3-5-haiku-20241022",
+        "cost": {"total_usd": 0.024, "provider": "compare", "model": "gpt-4o-mini-2024-07-18,claude-3-5-haiku-20241022"}
     }
 }
 ````
@@ -565,28 +662,24 @@ Each finding in the `findings` array:
 ### Sections
 
 1. **Header**
-
     - Argus branding with shield emoji
     - Target WordPress site URL
     - Scan date and mode
     - Summary pills with severity counts and colors
 
 2. **Executive Summary** (if `--use-ai` enabled)
-
     - Non-technical overview for stakeholders
     - Key risks explained in plain language
     - Business impact assessment
     - Priority actions with deadlines
 
 3. **Technical Remediation** (if `--use-ai` enabled)
-
     - Step-by-step fixes with commands
     - WordPress-specific configuration snippets
     - .htaccess, functions.php, and wp-config.php examples
     - WP-CLI commands for automation
 
 4. **Findings Table**
-
     - Sortable by ID, Severity, Confidence
     - Expandable evidence sections
     - Color-coded severity badges
@@ -594,21 +687,18 @@ Each finding in the `findings` array:
     - Direct links to WordPress documentation
 
 5. **WordPress Information**
-
     - Detected version
     - Installed plugins and themes count
     - Vulnerable components summary
     - Security headers status
 
 6. **Scan Metadata**
-
     - Scan duration and request count
     - Rate limiting status
     - Scope limitations (safe vs aggressive)
     - False positive disclaimer
 
 7. **Consent Verification** (if aggressive/AI mode)
-
     - Verification method used
     - Token displayed
     - Timestamp recorded
@@ -621,12 +711,12 @@ Each finding in the `findings` array:
 
 ### Styling Features
 
--   **WordPress-themed design**: Purple gradient (WordPress colors)
--   **Responsive layout**: Mobile-first, tablet and desktop optimized
--   **Print-friendly**: Clean page breaks, grayscale-optimized
--   **Accessibility**: WCAG 2.1 AA compliant
--   **Interactive elements**: Expandable findings, syntax highlighting
--   **Professional typography**: System font stack for performance
+- **WordPress-themed design**: Purple gradient (WordPress colors)
+- **Responsive layout**: Mobile-first, tablet and desktop optimized
+- **Print-friendly**: Clean page breaks, grayscale-optimized
+- **Accessibility**: WCAG 2.1 AA compliant
+- **Interactive elements**: Expandable findings, syntax highlighting
+- **Professional typography**: System font stack for performance
 
 ### Example HTML Structure
 
@@ -636,7 +726,7 @@ Each finding in the `findings` array:
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="generator" content="Argus 0.1.0" />
+        <meta name="generator" content="Argus 0.2.0" />
         <title>Argus Security Report — https://example-wp-site.com</title>
         <style>
             /* Embedded CSS for portability */
@@ -742,7 +832,7 @@ Each finding in the `findings` array:
             </div>
 
             <footer>
-                <p><strong>Generated by Argus v0.1.0</strong> — WordPress Security Scanner</p>
+                <p><strong>Generated by Argus v0.2.0</strong> — WordPress Security Scanner</p>
                 <p>Use only on authorized targets. Report is for informational purposes.</p>
                 <p>© 2025 Rodney Dhavid Jimenez Chacin (rodhnin) — MIT License</p>
             </footer>
@@ -769,7 +859,7 @@ findings = scanner.scan()
 generator = ReportGenerator()
 report = generator.create_report(
     tool='argus',
-    version='0.1.0',
+    version='0.2.0',
     target='https://example-wp-site.com',
     mode='safe',
     findings=findings,
@@ -1066,36 +1156,36 @@ recommendation = "Secure configuration files"
 
 **Critical**: Credentials/data exposure
 
--   wp-config.php accessible
--   Database dumps exposed
--   .env files with API keys
--   Unrestricted file upload to PHP directories
+- wp-config.php accessible
+- Database dumps exposed
+- .env files with API keys
+- Unrestricted file upload to PHP directories
 
 **High**: Exploitation enabling
 
--   Known vulnerable plugin with public exploit
--   Admin username enumerated
--   XML-RPC brute force vector
--   Default admin credentials
+- Known vulnerable plugin with public exploit
+- Admin username enumerated
+- XML-RPC brute force vector
+- Default admin credentials
 
 **Medium**: Information disclosure
 
--   WordPress version disclosed
--   Plugin/theme versions visible
--   Directory listing enabled
--   Missing security headers
+- WordPress version disclosed
+- Plugin/theme versions visible
+- Directory listing enabled
+- Missing security headers
 
 **Low**: Best practice violations
 
--   Non-critical headers missing
--   Default WordPress pages accessible
--   Informational headers present
+- Non-critical headers missing
+- Default WordPress pages accessible
+- Informational headers present
 
 **Info**: Detection only
 
--   WordPress detected
--   Plugin enumerated (no vulnerability)
--   Theme identified
+- WordPress detected
+- Plugin enumerated (no vulnerability)
+- Theme identified
 
 ### 4. CVE Integration
 
@@ -1375,23 +1465,23 @@ def secure_report_file(report_path: Path):
 
 ### WordPress Security Documentation
 
--   **WordPress Hardening Guide**: https://wordpress.org/documentation/article/hardening-wordpress/
--   **WPScan Vulnerability Database**: https://wpscan.com/
--   **OWASP WordPress Security**: https://owasp.org/www-community/vulnerabilities/
--   **WordPress Security Plugin Guidelines**: https://wordpress.org/plugins/developers/
+- **WordPress Hardening Guide**: https://wordpress.org/documentation/article/hardening-wordpress/
+- **WPScan Vulnerability Database**: https://wpscan.com/
+- **OWASP WordPress Security**: https://owasp.org/www-community/vulnerabilities/
+- **WordPress Security Plugin Guidelines**: https://wordpress.org/plugins/developers/
 
 ### Support and Community
 
--   **Issues**: https://github.com/rodhnin/argus-wp-watcher/issues
--   **Discussions**: https://github.com/rodhnin/argus-wp-watcher/discussions
+- **Issues**: https://github.com/rodhnin/argus-wp-watcher/issues
+- **Discussions**: https://github.com/rodhnin/argus-wp-watcher/discussions
 
 ### Related Tools
 
--   **WPScan**: https://wpscan.com/
--   **WordPress Security Plugins**: Wordfence, iThemes Security, Sucuri
+- **WPScan**: https://wpscan.com/
+- **WordPress Security Plugins**: Wordfence, iThemes Security, Sucuri
 
 ---
 
-_Last Updated: November 2025_  
-_Version: 1.0_  
-_Tool: Argus v0.1.0_  
+_Last Updated: May 2026_
+_Version: 2.0_
+_Tool: Argus v0.2.0_

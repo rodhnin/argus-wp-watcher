@@ -44,9 +44,9 @@ class Database:
             db_path: Path to SQLite database file (default from config)
         """
         config = get_config()
-        self.db_path = db_path or config.database
+        self.db_path = Path(db_path or config.database).expanduser()
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        self.readonly_mode = False  # BUG-017: Track if DB is read-only
+        self.readonly_mode = False
         
         # Check if database exists and is valid
         if self.db_path.exists():
@@ -716,6 +716,123 @@ class Database:
         
         summary['total'] = sum(summary.values())
         return summary
+
+    # =========================================================================
+    # AI COST TRACKING (Block 4 IMPROV-005)
+    # =========================================================================
+
+    def save_ai_cost(
+        self,
+        scan_id: Optional[int],
+        provider: str,
+        model: str,
+        analysis_type: str,
+        input_tokens: int,
+        output_tokens: int,
+        cost_usd: float,
+        duration_s: Optional[float] = None
+    ) -> Optional[int]:
+        """
+        Save an AI analysis cost record.
+
+        Args:
+            scan_id: Associated scan ID (may be None for standalone analysis)
+            provider: LLM provider (openai, anthropic, ollama)
+            model: Model identifier
+            analysis_type: Type of analysis (technical, non_technical, agent, compare)
+            input_tokens: Prompt tokens consumed
+            output_tokens: Completion tokens generated
+            cost_usd: Total cost in USD
+            duration_s: Analysis duration in seconds
+
+        Returns:
+            cost_id if saved, None if read-only mode
+        """
+        if self.readonly_mode:
+            return None
+
+        total_tokens = input_tokens + output_tokens
+
+        with self._get_connection() as conn:
+            cursor = conn.execute(
+                """
+                INSERT INTO ai_costs
+                    (scan_id, provider, model, analysis_type,
+                     input_tokens, output_tokens, total_tokens, cost_usd, duration_s)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (scan_id, provider, model, analysis_type,
+                 input_tokens, output_tokens, total_tokens,
+                 round(cost_usd, 6), duration_s)
+            )
+            return cursor.lastrowid
+
+    def get_ai_costs(self, scan_id: int) -> List[Dict[str, Any]]:
+        """Get all AI cost records for a scan."""
+        with self._get_connection() as conn:
+            cursor = conn.execute(
+                """
+                SELECT * FROM ai_costs WHERE scan_id = ? ORDER BY created_at
+                """,
+                (scan_id,)
+            )
+            return [dict(row) for row in cursor.fetchall()]
+
+    def get_total_ai_costs(self, days: int = 30) -> Dict[str, Any]:
+        """
+        Get aggregated AI cost statistics for the last N days.
+
+        Returns:
+            Dict with total_scans, total_cost_usd, avg_cost_per_scan,
+            monthly_projection, breakdown_by_provider
+        """
+        with self._get_connection() as conn:
+            cursor = conn.execute(
+                """
+                SELECT
+                    COUNT(DISTINCT scan_id)   AS total_scans,
+                    SUM(cost_usd)             AS total_cost_usd,
+                    SUM(total_tokens)         AS total_tokens,
+                    provider,
+                    model
+                FROM ai_costs
+                WHERE created_at >= datetime('now', ?, 'utc')
+                GROUP BY provider, model
+                ORDER BY total_cost_usd DESC
+                """,
+                (f"-{days} days",)
+            )
+            rows = [dict(r) for r in cursor.fetchall()]
+
+        if not rows:
+            return {
+                'total_scans': 0,
+                'total_cost_usd': 0.0,
+                'avg_cost_per_scan': 0.0,
+                'monthly_projection': 0.0,
+                'breakdown_by_provider': {}
+            }
+
+        total_cost = sum(r['total_cost_usd'] or 0 for r in rows)
+        total_scans = rows[0]['total_scans'] if rows else 0
+        avg = total_cost / total_scans if total_scans else 0
+        monthly_projection = (total_cost / days) * 30 if days else 0
+
+        breakdown = {}
+        for row in rows:
+            prov = row['provider']
+            if prov not in breakdown:
+                breakdown[prov] = {'cost_usd': 0.0, 'tokens': 0}
+            breakdown[prov]['cost_usd'] += row['total_cost_usd'] or 0
+            breakdown[prov]['tokens'] += row['total_tokens'] or 0
+
+        return {
+            'total_scans': total_scans,
+            'total_cost_usd': round(total_cost, 4),
+            'avg_cost_per_scan': round(avg, 4),
+            'monthly_projection': round(monthly_projection, 4),
+            'breakdown_by_provider': breakdown
+        }
 
 
 # Global database instance

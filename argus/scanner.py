@@ -7,6 +7,7 @@ Author: Rodney Dhavid Jimenez Chacin (rodhnin)
 License: MIT
 """
 
+import copy
 import time
 from datetime import datetime
 from typing import List, Dict, Optional
@@ -20,6 +21,7 @@ from .core.db import get_db
 from .core.report import ReportGenerator
 from .core.ai import analyze_report
 from .core.http_client import create_http_client
+from .core.diff import compute_diff
 
 from .checks.fingerprint import WordPressFingerprint
 from .checks.plugins import PluginThemeEnumerator
@@ -27,6 +29,8 @@ from .checks.files import SensitiveFilesChecker
 from .checks.users import UserEnumerator
 from .checks.headers import SecurityHeadersChecker
 from .checks.config import ConfigChecker
+from .checks.login import LoginSecurityChecker
+from .checks.crawl import CrawlChecker
 
 logger = get_logger(__name__)
 
@@ -48,7 +52,10 @@ class WordPressScanner:
         target: str,
         mode: str = 'safe',
         use_ai: bool = False,
-        ai_tone: str = 'both'
+        ai_tone: str = 'both',
+        compare_providers=None,
+        use_agent: bool = False,
+        diff_scan_id: Optional[str] = None,
     ) -> Dict:
         """
         Execute full WordPress security scan.
@@ -74,19 +81,37 @@ class WordPressScanner:
         logger.info(f"Starting Argus scan: {target}")
         logger.info(f"Mode: {mode.upper()}")
         logger.info(f"AI Analysis: {'Enabled' if use_ai else 'Disabled'}")
-        logger.info(f"Parallel Phases: ENABLED (Thread Pool: {self.config.max_workers} workers)")
+        logger.info(f"Parallel Phases: ENABLED (Thread Pool: {self.config.max_workers} workers — aggressive mode: 10)")
         logger.info(f"=" * 70)
         
         # Create HTTP client with rate limiting
         http_client = create_http_client(mode=mode, config=self.config)
-        
+
+        # Create an effective config copy so aggressive mode gets different limits
+        # without mutating the global singleton
+        effective_config = copy.copy(self.config)
+        effective_config.scan_mode = mode
+        if mode == 'aggressive':
+            effective_config.wp_max_plugins_check = 500
+            effective_config.wp_max_users_check = 50
+            # Raise thread count to the aggressive default (10) only when the user
+            # has not explicitly requested a higher value via --threads.
+            # If the user passed --threads > 10 we honour their setting.
+            # If they passed --threads < 10 we still enforce the aggressive floor
+            # because aggressive scans need concurrency to be meaningful.
+            effective_config.max_workers = max(self.config.max_workers, 10)
+
         # Initialize check modules with HTTP client
-        self.fingerprint = WordPressFingerprint(self.config, http_client)
-        self.plugins = PluginThemeEnumerator(self.config, http_client)
-        self.files = SensitiveFilesChecker(self.config, http_client, target)
-        self.users = UserEnumerator(self.config, http_client)
-        self.headers = SecurityHeadersChecker(self.config, http_client)
-        self.config_checker = ConfigChecker(self.config, http_client)
+        self.fingerprint = WordPressFingerprint(effective_config, http_client)
+        self.plugins = PluginThemeEnumerator(effective_config, http_client)
+        self.files = SensitiveFilesChecker(effective_config, http_client, target)
+        self.users = UserEnumerator(effective_config, http_client)
+        self.headers = SecurityHeadersChecker(effective_config, http_client)
+        self.config_checker = ConfigChecker(effective_config, http_client)
+
+        # Initialize login checker for aggressive mode
+        if mode == 'aggressive':
+            self.login = LoginSecurityChecker(effective_config, http_client)
         
         # Verify consent for aggressive/AI modes
         if mode == 'aggressive' or use_ai:
@@ -239,23 +264,28 @@ class WordPressScanner:
             
             # Phases 2-6 now execute IN PARALLEL
             logger.info("\n[Phases 2-6] Running parallel security checks...")
-            logger.info(f"Thread pool: {self.config.max_workers} workers")
-            
+            logger.info(f"Thread pool: {effective_config.max_workers} workers")
+
             # Define phases to run concurrently
             phases = {
-                'files': (self.files.scan, "Sensitive Files", len(self.config.wp_common_paths)),
-                'plugins': (self.plugins.scan, "Plugins & Themes", 
-                           self.config.wp_max_plugins_check + self.config.wp_max_themes_check),
-                'users': (self.users.scan, "Users", self.config.wp_max_users_check + 2),
+                'files': (self.files.scan, "Sensitive Files", len(effective_config.wp_common_paths)),
+                'plugins': (self.plugins.scan, "Plugins & Themes",
+                           effective_config.wp_max_plugins_check + effective_config.wp_max_themes_check),
+                'users': (self.users.scan, "Users", effective_config.wp_max_users_check + 2),
                 'headers': (self.headers.scan, "Security Headers", 2),
                 'config': (self.config_checker.scan, "Configuration", 10),
             }
+
+            if mode == 'aggressive':
+                phases['login'] = (self.login.scan, "Login Security", 8)
+                self.crawl = CrawlChecker(config=effective_config, http_client=http_client)
+                phases['crawl'] = (self.crawl.scan, "Web Crawl", 5)
             
             # Execute phases concurrently
             phase_results = {}
             phase_start = time.time()
             
-            with ThreadPoolExecutor(max_workers=min(5, self.config.max_workers)) as executor:
+            with ThreadPoolExecutor(max_workers=effective_config.max_workers) as executor:
                 # Submit all phases
                 future_to_phase = {
                     executor.submit(scan_func, target): (phase_name, display_name, req_count)
@@ -294,7 +324,9 @@ class WordPressScanner:
             result = self._finalize_scan(
                 scan_id, all_findings, start_time, requests_count,
                 status='completed', target=target, mode=mode,
-                use_ai=use_ai, ai_tone=ai_tone
+                use_ai=use_ai, ai_tone=ai_tone,
+                compare_providers=compare_providers, use_agent=use_agent,
+                diff_scan_id=diff_scan_id,
             )
             
             logger.info("\n" + "=" * 70)
@@ -349,7 +381,10 @@ class WordPressScanner:
         target: str,
         mode: str,
         use_ai: bool = False,
-        ai_tone: Optional[str] = None
+        ai_tone: Optional[str] = None,
+        compare_providers=None,
+        use_agent: bool = False,
+        diff_scan_id: Optional[str] = None,
     ) -> Dict:
         """
         Generate reports, save to DB, and optionally run AI analysis.
@@ -446,30 +481,25 @@ class WordPressScanner:
         
         # Run AI analysis if enabled (BEFORE saving reports)
         if use_ai:
-            logger.info("\n[AI Analysis] Generating insights...")
+            logger.info("[AI Analysis] Generating insights...")
             try:
-                ai_analysis = analyze_report(report, tone=ai_tone, config=self.config)
-                
+                ai_analysis = analyze_report(
+                    report,
+                    tone=ai_tone,
+                    config=self.config,
+                    scan_id=scan_id,
+                    compare_providers=compare_providers,
+                    use_agent=use_agent,
+                )
+
                 if ai_analysis:
-                    # Add AI analysis to report dict
                     report['ai_analysis'] = ai_analysis
-                    logger.info("✓ AI analysis completed")
-            
+                    logger.info("AI analysis completed")
+
             except Exception as e:
                 logger.error(f"AI analysis failed: {e}")
         
-        # Save JSON report ONCE (with or without AI)
-        json_path = self.report_gen.save_json(report)
-        
-        # Generate HTML ONCE (with or without AI)
-        html_path = None
-        if self.config.generate_html:
-            try:
-                html_path = self.report_gen.generate_html(report, json_path)
-            except Exception as e:
-                logger.warning(f"HTML generation failed: {e}")
-        
-        # Save findings to database
+        # Save findings to database first (needed for diff computation)
         for finding in findings:
             self.db.add_finding(
                 scan_id=scan_id,
@@ -482,10 +512,32 @@ class WordPressScanner:
                 evidence_value=finding.get('evidence', {}).get('value'),
                 references=finding.get('references')
             )
-        
+
+        # Compute diff against reference scan (if requested)
+        if diff_scan_id and scan_id:
+            diff_result = compute_diff(
+                db=self.db,
+                current_scan_id=scan_id,
+                ref_scan_id_or_last=diff_scan_id,
+                domain=domain,
+            )
+            if diff_result:
+                report['diff'] = diff_result
+
+        # Save JSON report ONCE (with AI and diff if applicable)
+        json_path = self.report_gen.save_json(report)
+
+        # Generate HTML ONCE (with AI and diff if applicable)
+        html_path = None
+        if self.config.generate_html:
+            try:
+                html_path = self.report_gen.generate_html(report, json_path)
+            except Exception as e:
+                logger.warning(f"HTML generation failed: {e}")
+
         # Get summary from report
         summary = report['summary']
-        
+
         # Finish scan in database
         self.db.finish_scan(
             scan_id,
@@ -495,17 +547,23 @@ class WordPressScanner:
             summary=summary
         )
         
+        # Extract AI cost for CLI display
+        ai_cost_info  = report.get('ai_analysis', {}) or {}
+        ai_cost_block = ai_cost_info.get('cost', {})
+
         return {
-            'scan_id': scan_id,
-            'status': status,
+            'scan_id':           scan_id,
+            'status':            status,
             'wordpress_detected': True,
-            'findings_count': len(findings),
-            'summary': summary,
-            'duration': duration,
-            'requests_sent': requests_count,
-            'report_json': str(json_path),
-            'report_html': str(html_path) if html_path else None,
-            'ai_analysis': bool(report.get('ai_analysis'))
+            'findings_count':    len(findings),
+            'summary':           summary,
+            'duration':          duration,
+            'requests_sent':     requests_count,
+            'report_json':       str(json_path),
+            'report_html':       str(html_path) if html_path else None,
+            'ai_analysis':       bool(report.get('ai_analysis')),
+            'ai_cost_usd':       ai_cost_block.get('total_usd') if ai_cost_block else None,
+            'ai_model':          ai_cost_block.get('model') if ai_cost_block else None,
         }
 
 

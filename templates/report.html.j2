@@ -637,6 +637,222 @@
                 print-color-adjust: exact;
             }
         }
+
+        /* ============================================================================
+           FILTER BAR
+           ============================================================================ */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .filter-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 6px 14px;
+            border-radius: 14px;
+            border: 2px solid var(--border);
+            background: white;
+            color: var(--text-light);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--argus-purple);
+            color: var(--argus-purple);
+        }
+
+        .filter-btn.active {
+            background: var(--argus-purple);
+            border-color: var(--argus-purple);
+            color: white;
+        }
+
+        .filter-btn.f-critical.active { background: var(--critical); border-color: var(--critical); color: white; }
+        .filter-btn.f-high.active     { background: var(--high);     border-color: var(--high);     color: white; }
+        .filter-btn.f-medium.active   { background: var(--medium);   border-color: var(--medium);   color: #333;  }
+        .filter-btn.f-low.active      { background: var(--low);      border-color: var(--low);      color: white; }
+        .filter-btn.f-info.active     { background: var(--info);     border-color: var(--info);     color: white; }
+
+        .filter-cnt {
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            padding: 1px 6px;
+            font-size: 11px;
+        }
+
+        .filter-btn:not(.active) .filter-cnt {
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* ============================================================================
+           CVE / CWE BADGES
+           ============================================================================ */
+        .cve-badge {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 10px;
+            background: #dc3545;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: opacity 0.2s;
+            letter-spacing: 0.3px;
+        }
+
+        .cve-badge:hover { opacity: 0.82; }
+
+        .cwe-badge {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 10px;
+            background: #6f42c1;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        /* ============================================================================
+           EXPANDABLE PANELS (CVE list, header snippets)
+           ============================================================================ */
+        .expand-toggle {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--argus-purple);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .expand-toggle:hover { background: var(--border); }
+
+        .expand-toggle .expand-arrow {
+            transition: transform 0.2s;
+            display: inline-block;
+            font-size: 10px;
+        }
+
+        .expand-toggle.open .expand-arrow { transform: rotate(90deg); }
+
+        .expand-panel {
+            display: none;
+            margin-top: 8px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .vuln-item {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            background: white;
+            font-size: 13px;
+        }
+
+        .vuln-item:last-child { border-bottom: none; }
+
+        .vuln-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+
+        .vuln-title-text {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 12px;
+        }
+
+        .vuln-desc {
+            color: var(--text-light);
+            font-size: 12px;
+            line-height: 1.55;
+            margin-top: 4px;
+        }
+
+        .vuln-link { margin-top: 4px; font-size: 12px; }
+        .vuln-link a { color: var(--argus-purple); text-decoration: none; }
+        .vuln-link a:hover { text-decoration: underline; }
+        .vuln-date { font-size: 11px; color: var(--text-light); margin-top: 3px; }
+
+        /* Snippet panel (security header fix examples) */
+        .snippet-panel { background: var(--argus-dark); padding: 0; border-color: transparent; }
+
+        .snip-label {
+            background: rgba(255,255,255,0.08);
+            color: #a0aec0;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 5px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .snip-code {
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 10px 14px;
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            background: transparent;
+            box-shadow: none;
+            border-left: none;
+            border-radius: 0;
+        }
+
+        /* ============================================================================
+           EXPANDABLE RECOMMENDATIONS
+           ============================================================================ */
+        .expand-rec-btn {
+            background: none;
+            border: none;
+            color: var(--argus-purple);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 0;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .expand-rec-btn:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -710,47 +926,93 @@
             {% endif %}
 
             <!-- AI ANALYSIS WITH DYNAMIC TABS -->
-            {% if ai and (ai.executive_summary or ai.technical_remediation) %}
+            {% if ai and (ai.executive_summary or ai.technical_remediation or ai.agent_analysis or ai.comparison_mode) %}
             <div class="ai-analysis">
-                <h2>🤖 AI-Powered Security Analysis</h2>
-                
+                <h2>AI-Powered Security Analysis</h2>
+
+                {% if ai.comparison_mode %}
+                <!-- COMPARE MODE: one tab per provider -->
+                {% set providers = ai.results.keys()|list %}
+                <div class="ai-tabs">
+                    {% for provider in providers %}
+                    <button class="ai-tab {% if loop.first %}active{% endif %}"
+                            onclick="showAiTab('cmp-{{ loop.index }}')">{{ provider }}</button>
+                    {% endfor %}
+                </div>
+                {% for provider, pdata in ai.results.items() %}
+                <div id="cmp-{{ loop.index }}-tab" class="ai-content {% if loop.first %}active{% endif %}">
+                    <h3 style="color: var(--argus-purple); margin-bottom: 16px;">{{ provider }}</h3>
+                    {% if pdata.executive_summary %}
+                    <h4>Executive Summary</h4>
+                    {{ pdata.executive_summary|safe }}
+                    {% endif %}
+                    {% if pdata.technical_remediation %}
+                    <h4>Technical Remediation</h4>
+                    {{ pdata.technical_remediation|safe }}
+                    {% endif %}
+                    {% if pdata.agent_analysis %}
+                    <h4>Agent Analysis</h4>
+                    {{ pdata.agent_analysis|safe }}
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% set cost = ai.cost %}
+                {% if cost %}
+                <div class="ai-meta">
+                    Comparison: {{ ai.providers_compared|join(', ') }} &mdash;
+                    Total cost: ${{ "%.4f"|format(cost.total_usd) }} &mdash; {{ ai.generated_at }}
+                </div>
+                {% endif %}
+
+                {% elif ai.agent_analysis %}
+                <!-- AGENT MODE -->
+                <div class="ai-content active">
+                    <h3 style="color: var(--argus-purple); margin-bottom: 20px;">Agent Analysis</h3>
+                    {{ ai.agent_analysis|safe }}
+                </div>
+                {% if ai.model_used %}
+                <div class="ai-meta">
+                    Generated by <strong>{{ ai.model_used }}</strong> (agent mode) at {{ ai.generated_at }}
+                </div>
+                {% endif %}
+
+                {% else %}
+                <!-- STANDARD MODE: executive / technical tabs -->
                 {% set has_executive = ai.executive_summary and ai.executive_summary|length > 0 %}
                 {% set has_technical = ai.technical_remediation and ai.technical_remediation|length > 0 %}
-                
-                <!-- Show tabs only if both analyses exist -->
+
                 {% if has_executive and has_technical %}
                 <div class="ai-tabs">
                     <button class="ai-tab active" onclick="showAiTab('executive')">Executive Summary</button>
                     <button class="ai-tab" onclick="showAiTab('technical')">Technical Remediation</button>
                 </div>
                 {% endif %}
-                
-                <!-- Executive Summary -->
+
                 {% if has_executive %}
                 <div id="executive-tab" class="ai-content {% if not has_technical or has_executive %}active{% endif %}">
                     {% if not has_technical %}
-                    <h3 style="color: var(--argus-purple); margin-bottom: 20px;">📊 Executive Summary</h3>
+                    <h3 style="color: var(--argus-purple); margin-bottom: 20px;">Executive Summary</h3>
                     {% endif %}
                     {{ ai.executive_summary|safe }}
                 </div>
                 {% endif %}
-                
-                <!-- Technical Remediation -->
+
                 {% if has_technical %}
                 <div id="technical-tab" class="ai-content {% if not has_executive %}active{% endif %}">
                     {% if not has_executive %}
-                    <h3 style="color: var(--argus-purple); margin-bottom: 20px;">🔧 Technical Remediation</h3>
+                    <h3 style="color: var(--argus-purple); margin-bottom: 20px;">Technical Remediation</h3>
                     {% endif %}
                     {{ ai.technical_remediation|safe }}
                 </div>
                 {% endif %}
-                
-                <!-- AI Metadata -->
+
                 {% if ai.model_used %}
                 <div class="ai-meta">
                     Generated by <strong>{{ ai.model_used }}</strong> at {{ ai.generated_at }}
                 </div>
                 {% endif %}
+                {% endif %}
+
             </div>
             {% endif %}
 
@@ -758,36 +1020,213 @@
             <div class="findings">
                 <h2>🔍 Security Findings ({{ findings|length }})</h2>
                 {% if findings %}
+
+                {# Severity counts for filter bar #}
+                {% set crit_n = findings|selectattr('severity','equalto','critical')|list|length %}
+                {% set high_n = findings|selectattr('severity','equalto','high')|list|length %}
+                {% set med_n  = findings|selectattr('severity','equalto','medium')|list|length %}
+                {% set low_n  = findings|selectattr('severity','equalto','low')|list|length %}
+                {% set info_n = findings|selectattr('severity','equalto','info')|list|length %}
+
+                <div class="filter-bar">
+                    <span class="filter-label">Filter:</span>
+                    <div class="filter-btns">
+                        <button class="filter-btn active" onclick="filterSeverity('all',this)">All <span class="filter-cnt">{{ findings|length }}</span></button>
+                        {% if crit_n > 0 %}<button class="filter-btn f-critical" onclick="filterSeverity('critical',this)">Critical <span class="filter-cnt">{{ crit_n }}</span></button>{% endif %}
+                        {% if high_n > 0 %}<button class="filter-btn f-high"     onclick="filterSeverity('high',this)">High <span class="filter-cnt">{{ high_n }}</span></button>{% endif %}
+                        {% if med_n  > 0 %}<button class="filter-btn f-medium"   onclick="filterSeverity('medium',this)">Medium <span class="filter-cnt">{{ med_n }}</span></button>{% endif %}
+                        {% if low_n  > 0 %}<button class="filter-btn f-low"      onclick="filterSeverity('low',this)">Low <span class="filter-cnt">{{ low_n }}</span></button>{% endif %}
+                        {% if info_n > 0 %}<button class="filter-btn f-info"     onclick="filterSeverity('info',this)">Info <span class="filter-cnt">{{ info_n }}</span></button>{% endif %}
+                    </div>
+                </div>
+
                 <table id="findings">
                     <thead>
                         <tr>
                             <th style="width: 10%">ID</th>
-                            <th style="width: 35%">Finding</th>
-                            <th style="width: 10%">Severity</th>
-                            <th style="width: 10%">Confidence</th>
+                            <th style="width: 37%">Finding</th>
+                            <th style="width: 9%">Severity</th>
+                            <th style="width: 9%">Confidence</th>
                             <th style="width: 35%">Recommendation</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for finding in findings %}
-                        <tr>
+                        {# Derive category from title for data attribute #}
+                        {% set tl = finding.title|lower %}
+                        {% if 'plugin' in tl %}{% set fcat = 'plugins' %}
+                        {% elif 'theme' in tl %}{% set fcat = 'themes' %}
+                        {% elif 'header' in tl or 'cookie' in tl %}{% set fcat = 'headers' %}
+                        {% elif 'user' in tl or 'author' in tl %}{% set fcat = 'users' %}
+                        {% elif 'xmlrpc' in tl or 'directory' in tl or 'debug' in tl or 'editor' in tl %}{% set fcat = 'config' %}
+                        {% elif 'file' in tl or 'backup' in tl or '.git' in tl or 'sql' in tl or 'license' in tl or 'readme' in tl or '.env' in tl %}{% set fcat = 'files' %}
+                        {% elif 'wordpress' in tl or 'core' in tl or 'version' in tl %}{% set fcat = 'core' %}
+                        {% else %}{% set fcat = 'other' %}{% endif %}
+
+                        <tr data-severity="{{ finding.severity }}" data-category="{{ fcat }}">
                             <td><code>{{ finding.id }}</code></td>
                             <td>
                                 <strong>{{ finding.title }}</strong>
+
                                 {% if finding.description %}
                                 <p style="margin-top: 8px; font-size: 13px; color: var(--text-light);">
                                     {{ finding.description }}
                                 </p>
                                 {% endif %}
+
                                 {% if finding.evidence %}
                                 <div class="evidence">
-                                    <strong>{{ finding.evidence.type }}:</strong> 
+                                    <strong>{{ finding.evidence.type }}:</strong>
                                     {{ finding.evidence.value }}
                                     {% if finding.evidence.context %}
                                     <br><small style="color: var(--text-light);">{{ finding.evidence.context }}</small>
                                     {% endif %}
                                 </div>
                                 {% endif %}
+
+                                {# ── OWASP Top 10 badge ──────────────────────── #}
+                                {% if finding.owasp %}
+                                <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px; align-items: center;">
+                                    <span style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.4px;">OWASP:</span>
+                                    <a href="https://owasp.org/Top10/{{ finding.owasp.id }}_2021-{{ finding.owasp.name | replace(' ', '_') | replace('(', '') | replace(')', '') | replace('/', '') }}/" target="_blank"
+                                       style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; background: #ede9fe; color: #4c1d95; border: 1px solid #c4b5fd; text-decoration: none;">
+                                        {{ finding.owasp.id }}: {{ finding.owasp.name }}
+                                    </a>
+                                </div>
+                                {% endif %}
+
+                                {# ── Latest version badge ────────────────────── #}
+                                {% if finding.latest_version %}
+                                <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px; align-items: center;">
+                                    <span style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.4px;">Latest:</span>
+                                    <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7;">v{{ finding.latest_version }}</span>
+                                </div>
+                                {% endif %}
+
+                                {# ── CVE badges ─────────────────────────────── #}
+                                {% if finding.cve %}
+                                <div style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 5px; align-items: center;">
+                                    <span style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.4px;">CVE:</span>
+                                    {% for cve_id in finding.cve %}
+                                    <a href="https://nvd.nist.gov/vuln/detail/{{ cve_id }}" target="_blank" class="cve-badge">{{ cve_id }}</a>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+
+                                {# ── CWE badges (unique) ─────────────────────── #}
+                                {% if finding.vulnerabilities %}
+                                {% set ns = namespace(cwes=[]) %}
+                                {% for v in finding.vulnerabilities %}
+                                    {% if v.cwe_id and v.cwe_id not in ns.cwes %}{% set ns.cwes = ns.cwes + [v.cwe_id] %}{% endif %}
+                                {% endfor %}
+                                {% if ns.cwes %}
+                                <div style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 5px; align-items: center;">
+                                    <span style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.4px;">CWE:</span>
+                                    {% for cwe_id in ns.cwes %}
+                                    {% set ns2 = namespace(cwe_name='') %}
+                                    {% for v in finding.vulnerabilities %}{% if v.cwe_id == cwe_id and v.cwe_name %}{% set ns2.cwe_name = v.cwe_name %}{% endif %}{% endfor %}
+                                    <span class="cwe-badge">{{ cwe_id }}{% if ns2.cwe_name %}: {{ ns2.cwe_name }}{% endif %}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+
+                                {# ── Expandable vuln detail panel ─────────────── #}
+                                <div style="margin-top: 8px;">
+                                    <button class="expand-toggle" onclick="togglePanel('vuln-{{ loop.index }}')">
+                                        <span class="expand-arrow">▶</span>
+                                        {{ finding.vulnerabilities|length }} CVE record{{ 's' if finding.vulnerabilities|length != 1 else '' }}
+                                    </button>
+                                    <div class="expand-panel" id="vuln-{{ loop.index }}">
+                                        {% for v in finding.vulnerabilities %}
+                                        <div class="vuln-item">
+                                            <div class="vuln-header">
+                                                {% if v.cve_id %}<a href="https://nvd.nist.gov/vuln/detail/{{ v.cve_id }}" target="_blank" class="cve-badge" style="font-size: 10px;">{{ v.cve_id }}</a>{% endif %}
+                                                {% if v.cvss %}
+                                                {% if v.cvss >= 9.0 %}{% set cvss_bg = '#fee2e2' %}{% set cvss_color = '#991b1b' %}{% set cvss_border = '#fca5a5' %}
+                                                {% elif v.cvss >= 7.0 %}{% set cvss_bg = '#ffedd5' %}{% set cvss_color = '#9a3412' %}{% set cvss_border = '#fdba74' %}
+                                                {% elif v.cvss >= 4.0 %}{% set cvss_bg = '#fef9c3' %}{% set cvss_color = '#713f12' %}{% set cvss_border = '#fde047' %}
+                                                {% else %}{% set cvss_bg = '#d1fae5' %}{% set cvss_color = '#065f46' %}{% set cvss_border = '#6ee7b7' %}{% endif %}
+                                                <span style="display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; background: {{ cvss_bg }}; color: {{ cvss_color }}; border: 1px solid {{ cvss_border }};">CVSS {{ v.cvss }}</span>
+                                                {% endif %}
+                                                {% if v.cwe_id %}<span class="cwe-badge" style="font-size: 10px;">{{ v.cwe_id }}</span>{% endif %}
+                                                <span class="vuln-title-text">{{ v.title }}</span>
+                                            </div>
+                                            {% if v.description %}<div class="vuln-desc">{{ v.description }}</div>{% endif %}
+                                            {% if v.link %}<div class="vuln-link"><a href="{{ v.link }}" target="_blank">🔗 Source</a></div>{% endif %}
+                                            {% if v.date %}<div class="vuln-date">Published: {{ v.date }}</div>{% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                {# ── Security header config snippets ──────────── #}
+                                {% if 'Missing security header:' in finding.title %}
+                                <div style="margin-top: 8px;">
+                                    <button class="expand-toggle" onclick="togglePanel('snip-{{ loop.index }}')">
+                                        <span class="expand-arrow">▶</span> Show configuration fix
+                                    </button>
+                                    <div class="expand-panel snippet-panel" id="snip-{{ loop.index }}">
+                                        {% if 'HSTS' in finding.title %}
+                                        <div class="snip-label">Apache (.htaccess / httpd.conf)</div>
+                                        <pre class="snip-code">Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"</pre>
+                                        <div class="snip-label">Nginx (server block)</div>
+                                        <pre class="snip-code">add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;</pre>
+                                        <div class="snip-label">WordPress (functions.php)</div>
+                                        <pre class="snip-code">add_action('send_headers', function() {
+    header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
+});</pre>
+                                        {% elif 'Content Security Policy' in finding.title %}
+                                        <div class="snip-label">Apache (.htaccess / httpd.conf)</div>
+                                        <pre class="snip-code">Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';"</pre>
+                                        <div class="snip-label">Nginx (server block)</div>
+                                        <pre class="snip-code">add_header Content-Security-Policy "default-src 'self'; script-src 'self';" always;</pre>
+                                        <div class="snip-label">WordPress (functions.php)</div>
+                                        <pre class="snip-code">add_action('send_headers', function() {
+    header("Content-Security-Policy: default-src 'self'; script-src 'self';");
+});</pre>
+                                        {% elif 'X-Frame-Options' in finding.title %}
+                                        <div class="snip-label">Apache (.htaccess / httpd.conf)</div>
+                                        <pre class="snip-code">Header always set X-Frame-Options "SAMEORIGIN"</pre>
+                                        <div class="snip-label">Nginx (server block)</div>
+                                        <pre class="snip-code">add_header X-Frame-Options "SAMEORIGIN" always;</pre>
+                                        <div class="snip-label">WordPress (functions.php)</div>
+                                        <pre class="snip-code">add_action('send_headers', function() {
+    header('X-Frame-Options: SAMEORIGIN');
+});</pre>
+                                        {% elif 'X-Content-Type-Options' in finding.title %}
+                                        <div class="snip-label">Apache (.htaccess / httpd.conf)</div>
+                                        <pre class="snip-code">Header set X-Content-Type-Options "nosniff"</pre>
+                                        <div class="snip-label">Nginx (server block)</div>
+                                        <pre class="snip-code">add_header X-Content-Type-Options "nosniff" always;</pre>
+                                        <div class="snip-label">WordPress (functions.php)</div>
+                                        <pre class="snip-code">add_action('send_headers', function() {
+    header('X-Content-Type-Options: nosniff');
+});</pre>
+                                        {% elif 'X-XSS-Protection' in finding.title %}
+                                        <div class="snip-label">Apache (.htaccess / httpd.conf)</div>
+                                        <pre class="snip-code">Header set X-XSS-Protection "1; mode=block"</pre>
+                                        <div class="snip-label">Nginx (server block)</div>
+                                        <pre class="snip-code">add_header X-XSS-Protection "1; mode=block" always;</pre>
+                                        {% elif 'Referrer-Policy' in finding.title %}
+                                        <div class="snip-label">Apache (.htaccess / httpd.conf)</div>
+                                        <pre class="snip-code">Header set Referrer-Policy "strict-origin-when-cross-origin"</pre>
+                                        <div class="snip-label">Nginx (server block)</div>
+                                        <pre class="snip-code">add_header Referrer-Policy "strict-origin-when-cross-origin" always;</pre>
+                                        <div class="snip-label">WordPress (functions.php)</div>
+                                        <pre class="snip-code">add_action('send_headers', function() {
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+});</pre>
+                                        {% elif 'Permissions-Policy' in finding.title %}
+                                        <div class="snip-label">Apache (.htaccess / httpd.conf)</div>
+                                        <pre class="snip-code">Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"</pre>
+                                        <div class="snip-label">Nginx (server block)</div>
+                                        <pre class="snip-code">add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;</pre>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
                             </td>
                             <td>
                                 <span class="severity-badge severity-{{ finding.severity }}">
@@ -798,16 +1237,23 @@
                                 <span class="confidence-badge">{{ finding.confidence }}</span>
                             </td>
                             <td>
-                                <div style="font-size: 13px; line-height: 1.6;">
-                                    {{ finding.recommendation }}
-                                </div>
+                                {# Expandable recommendation for long text #}
+                                {% set rec = finding.recommendation %}
+                                {% if rec|length > 200 %}
+                                <div class="rec-short" style="font-size: 13px; line-height: 1.6;">{{ rec[:200] }}…</div>
+                                <div class="rec-full" style="display:none; font-size: 13px; line-height: 1.6; white-space: pre-line;">{{ rec }}</div>
+                                <button class="expand-rec-btn" onclick="toggleRec(this)">Show more ▼</button>
+                                {% else %}
+                                <div style="font-size: 13px; line-height: 1.6;">{{ rec }}</div>
+                                {% endif %}
+
                                 {% if finding.references %}
                                 <div style="margin-top: 10px; font-size: 12px;">
                                     <strong>References:</strong><br>
                                     {% for ref in finding.references %}
-                                    <a href="{{ ref }}" target="_blank" style="color: var(--argus-purple); text-decoration: none;">
+                                    <a href="{{ ref }}" target="_blank" style="color: var(--argus-purple); text-decoration: none; display: block; margin-top: 3px;">
                                         🔗 {{ ref|truncate(60) }}
-                                    </a><br>
+                                    </a>
                                     {% endfor %}
                                 </div>
                                 {% endif %}
@@ -822,6 +1268,146 @@
                 </p>
                 {% endif %}
             </div>
+
+            <!-- DIFF REPORT -->
+            {% if diff %}
+            <div style="margin: 24px 0; padding: 24px; border-radius: 8px; border: 2px solid #e3e8ff; background: #f8f9ff;">
+                <h2 style="font-size: 20px; margin-bottom: 6px; color: #2c3e50;">Scan Comparison</h2>
+                <p style="font-size: 13px; color: #6c757d; margin-bottom: {% if diff.mode_mismatch %}12{% else %}20{% endif %}px;">
+                    Compared against scan #{{ diff.ref_scan_id }}
+                    {% if diff.ref_date %} &mdash; {{ diff.ref_date[:10] }}{% endif %}
+                    {% if diff.ref_target %} &mdash; {{ diff.ref_target }}{% endif %}
+                    {% if diff.ref_mode %}&mdash; <strong>{{ diff.ref_mode }} mode</strong>{% endif %}
+                </p>
+
+                {% if diff.mode_mismatch %}
+                <div style="margin-bottom: 20px; padding: 12px 16px; border-radius: 6px; background: #fff8e1; border: 1px solid #ffe082; display: flex; align-items: flex-start; gap: 10px;">
+                    <span style="font-size: 18px; line-height: 1.4;">&#9888;</span>
+                    <div>
+                        <strong style="color: #e65100; font-size: 13px;">Mode mismatch: {{ diff.ref_mode }} vs {{ diff.current_mode }}</strong>
+                        <p style="margin: 4px 0 0; font-size: 12px; color: #6c757d; line-height: 1.5;">
+                            The reference scan ran in <strong>{{ diff.ref_mode }}</strong> mode and this scan ran in
+                            <strong>{{ diff.current_mode }}</strong> mode.
+                            {% if diff.ref_mode == 'aggressive' and diff.current_mode == 'safe' %}
+                            Findings listed as <em>fixed</em> may include checks exclusive to aggressive mode
+                            (login security, crawl, brute-force detection) that were simply not executed in safe mode
+                            &mdash; they are <strong>not necessarily remediated</strong>.
+                            {% else %}
+                            Some differences may reflect checks available only in {{ diff.ref_mode }} mode
+                            rather than actual remediation.
+                            {% endif %}
+                            Verify manually before marking issues as resolved.
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Summary row -->
+                <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;">
+                    <div style="flex: 1; min-width: 140px; padding: 14px 18px; border-radius: 6px; background: #fff3f3; border: 1px solid #f5c6cb; text-align: center;">
+                        <div style="font-size: 28px; font-weight: 700; color: #dc3545;">{{ diff.new | length }}</div>
+                        <div style="font-size: 12px; font-weight: 600; color: #dc3545; text-transform: uppercase; letter-spacing: 0.5px;">New</div>
+                        <div style="font-size: 11px; color: #6c757d; margin-top: 2px;">appeared since last scan</div>
+                    </div>
+                    <div style="flex: 1; min-width: 140px; padding: 14px 18px; border-radius: 6px; background: #f0fff4; border: 1px solid #c3e6cb; text-align: center;">
+                        <div style="font-size: 28px; font-weight: 700; color: #28a745;">{{ diff.fixed | length }}</div>
+                        <div style="font-size: 12px; font-weight: 600; color: #28a745; text-transform: uppercase; letter-spacing: 0.5px;">Fixed</div>
+                        <div style="font-size: 11px; color: #6c757d; margin-top: 2px;">remediated since last scan</div>
+                    </div>
+                    <div style="flex: 1; min-width: 140px; padding: 14px 18px; border-radius: 6px; background: #f5f5f5; border: 1px solid #dee2e6; text-align: center;">
+                        <div style="font-size: 28px; font-weight: 700; color: #6c757d;">{{ diff.persisting | length }}</div>
+                        <div style="font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Persisting</div>
+                        <div style="font-size: 11px; color: #6c757d; margin-top: 2px;">present in both scans</div>
+                    </div>
+                </div>
+
+                {% macro sev_badge(sev) %}
+                <span style="
+                    display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 10px;
+                    font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+                    background: {% if sev == 'critical' %}#dc3545{% elif sev == 'high' %}#fd7e14{% elif sev == 'medium' %}#ffc107{% elif sev == 'low' %}#17a2b8{% else %}#6c757d{% endif %};
+                    color: {% if sev == 'medium' %}#212529{% else %}#fff{% endif %};
+                ">{{ sev }}</span>
+                {% endmacro %}
+
+                <!-- New findings -->
+                {% if diff.new %}
+                <h3 style="font-size: 14px; font-weight: 700; color: #dc3545; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    New findings ({{ diff.new | length }})
+                </h3>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; box-shadow: none; font-size: 13px;">
+                    <thead>
+                        <tr style="background: #fff3f3; border-bottom: 2px solid #f5c6cb;">
+                            <th style="padding: 8px 12px; text-align: left; color: #6c757d; font-weight: 600;">ID</th>
+                            <th style="padding: 8px 12px; text-align: left; color: #6c757d; font-weight: 600;">Title</th>
+                            <th style="padding: 8px 12px; text-align: left; color: #6c757d; font-weight: 600;">Severity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in diff.new %}
+                        <tr style="border-bottom: 1px solid #f5c6cb;">
+                            <td style="padding: 7px 12px; font-family: monospace; color: #dc3545;">{{ f.id }}</td>
+                            <td style="padding: 7px 12px;">{{ f.title }}</td>
+                            <td style="padding: 7px 12px;">{{ sev_badge(f.severity) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+
+                <!-- Fixed findings -->
+                {% if diff.fixed %}
+                <h3 style="font-size: 14px; font-weight: 700; color: #28a745; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Fixed findings ({{ diff.fixed | length }})
+                </h3>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; box-shadow: none; font-size: 13px;">
+                    <thead>
+                        <tr style="background: #f0fff4; border-bottom: 2px solid #c3e6cb;">
+                            <th style="padding: 8px 12px; text-align: left; color: #6c757d; font-weight: 600;">ID</th>
+                            <th style="padding: 8px 12px; text-align: left; color: #6c757d; font-weight: 600;">Title</th>
+                            <th style="padding: 8px 12px; text-align: left; color: #6c757d; font-weight: 600;">Severity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in diff.fixed %}
+                        <tr style="border-bottom: 1px solid #c3e6cb; text-decoration: line-through; opacity: 0.7;">
+                            <td style="padding: 7px 12px; font-family: monospace; color: #28a745;">{{ f.id }}</td>
+                            <td style="padding: 7px 12px;">{{ f.title }}</td>
+                            <td style="padding: 7px 12px;">{{ sev_badge(f.severity) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+
+                <!-- Persisting findings -->
+                {% if diff.persisting %}
+                <details>
+                    <summary style="font-size: 13px; font-weight: 600; color: #6c757d; cursor: pointer; margin-bottom: 8px; user-select: none;">
+                        Persisting findings ({{ diff.persisting | length }}) — click to expand
+                    </summary>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 8px; box-shadow: none; font-size: 13px;">
+                        <thead>
+                            <tr style="background: #f5f5f5; border-bottom: 2px solid #dee2e6;">
+                                <th style="padding: 8px 12px; text-align: left; color: #6c757d; font-weight: 600;">ID</th>
+                                <th style="padding: 8px 12px; text-align: left; color: #6c757d; font-weight: 600;">Title</th>
+                                <th style="padding: 8px 12px; text-align: left; color: #6c757d; font-weight: 600;">Severity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in diff.persisting %}
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 7px 12px; font-family: monospace; color: #6c757d;">{{ f.id }}</td>
+                                <td style="padding: 7px 12px; color: #6c757d;">{{ f.title }}</td>
+                                <td style="padding: 7px 12px;">{{ sev_badge(f.severity) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </details>
+                {% endif %}
+            </div>
+            {% endif %}
 
             <!-- NOTES -->
             {% if notes %}
@@ -876,6 +1462,7 @@
 
     <!-- JAVASCRIPT -->
     <script>
+        // ── AI analysis tabs ──────────────────────────────────────────────────────
         function showAiTab(tab) {
             document.querySelectorAll('.ai-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.ai-tab').forEach(el => el.classList.remove('active'));
@@ -883,6 +1470,36 @@
             event.target.classList.add('active');
         }
 
+        // ── Severity filter ───────────────────────────────────────────────────────
+        function filterSeverity(sev, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('#findings tbody tr').forEach(row => {
+                row.style.display = (sev === 'all' || row.dataset.severity === sev) ? '' : 'none';
+            });
+        }
+
+        // ── Expandable panel (CVE list / header snippets) ─────────────────────────
+        function togglePanel(id) {
+            const panel = document.getElementById(id);
+            const btn   = panel.previousElementSibling;
+            const open  = panel.style.display === 'block';
+            panel.style.display = open ? 'none' : 'block';
+            btn.classList.toggle('open', !open);
+        }
+
+        // ── Expandable recommendation ─────────────────────────────────────────────
+        function toggleRec(btn) {
+            const c    = btn.parentElement;
+            const sh   = c.querySelector('.rec-short');
+            const fu   = c.querySelector('.rec-full');
+            const open = fu.style.display === 'block';
+            sh.style.display = open ? 'block' : 'none';
+            fu.style.display = open ? 'none'  : 'block';
+            btn.textContent  = open ? 'Show more ▼' : 'Show less ▲';
+        }
+
+        // ── Print shortcut ────────────────────────────────────────────────────────
         window.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
                 window.print();

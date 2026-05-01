@@ -133,13 +133,13 @@ python -m argus --target https://example.com \
 
 ## AI-Powered Analysis
 
-### Basic AI Scan
+### Basic AI Scan (Default: gpt-4o-mini-2024-07-18)
 
 ```bash
 # Set API key
 export OPENAI_API_KEY="sk-..."
 
-# Generate both summaries
+# Generate both summaries (executive + technical)
 python -m argus --target https://example.com --use-ai --html
 ```
 
@@ -163,15 +163,91 @@ python -m argus --target https://example.com \
   --html
 ```
 
+### Override AI Provider/Model at Runtime
+
+```bash
+# Use Anthropic Claude instead of OpenAI
+export ANTHROPIC_API_KEY="sk-ant-..."
+python -m argus --target https://example.com \
+  --use-ai \
+  --ai-provider anthropic \
+  --ai-model claude-3-5-haiku-20241022
+
+# Use a more powerful (and expensive) model
+python -m argus --target https://example.com \
+  --use-ai \
+  --ai-model gpt-4o
+```
+
+### Streaming Output (see tokens as they generate)
+
+```bash
+# Stream AI output to terminal in real time
+python -m argus --target https://example.com \
+  --use-ai \
+  --ai-stream \
+  --html
+```
+
+### AI Agent with External Tool Lookup
+
+```bash
+# Agent mode: enriches analysis with NVD CVE data + WPVulnerability.net
+python -m argus --target https://example.com \
+  --use-ai \
+  --ai-agent \
+  --html \
+  -vv
+```
+
+### Multi-LLM Comparison
+
+```bash
+# Compare OpenAI vs Anthropic side by side
+python -m argus --target https://example.com \
+  --use-ai \
+  --ai-compare openai,anthropic \
+  --ai-tone technical \
+  --html
+
+# Compare specific models with explicit names
+python -m argus --target https://example.com \
+  --use-ai \
+  --ai-compare "openai:gpt-4o-mini-2024-07-18,anthropic:claude-3-5-haiku-20241022" \
+  --html
+```
+
+### Budget Control
+
+```bash
+# Set max spend per scan ($0.05 limit)
+python -m argus --target https://example.com \
+  --use-ai \
+  --ai-budget 0.05
+
+# AI analysis aborts if cost would exceed limit
+# Warning shown at 80% of budget
+```
+
 ### Custom API Key Variable
 
 ```bash
 # Use different env var
 export MY_CUSTOM_KEY="sk-..."
-
 python -m argus --target https://example.com \
   --use-ai \
   --api-key-env MY_CUSTOM_KEY
+```
+
+### Check AI Costs After Scan
+
+```bash
+# View costs.json
+cat ~/.argos/costs.json | python -m json.tool
+
+# Query DB for AI costs
+sqlite3 ~/.argos/argos.db \
+  "SELECT provider, model, analysis_type, cost_usd, duration_s FROM ai_costs ORDER BY cost_id DESC LIMIT 10;"
 ```
 
 ---

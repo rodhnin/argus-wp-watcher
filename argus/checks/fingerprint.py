@@ -17,10 +17,11 @@ from typing import Optional, Dict, List, Tuple
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
-import requests  # BUG-015: Import for exception types
+import requests
 
 from ..core.logging import get_logger
 from ..core.config import get_config
+from ..core.vuln_db import get_vuln_db
 
 logger = get_logger(__name__)
 
@@ -52,19 +53,11 @@ class WordPressFingerprint:
     ]
     
     def __init__(self, config=None, http_client=None):
-        """
-        Initialize fingerprint module.
-        
-        Args:
-            config: Config instance
-            http_client: RateLimitedSession instance
-        """
         self.config = config or get_config()
-        self.session = http_client  # Use rate-limited client
-        
-        # Fallback to regular session if no client provided
+        self.session = http_client
+        self.vuln_db = get_vuln_db()
+
         if self.session is None:
-            import requests
             self.session = requests.Session()
             self.session.headers.update({'User-Agent': self.config.user_agent})
             logger.warning("No HTTP client provided, using non-rate-limited session")
@@ -160,35 +153,10 @@ class WordPressFingerprint:
         if v and not version:
             version = v
         
-        # Create finding
+        # Create finding — enrich with CVEs if version known
         if version:
-            findings.append({
-                'id': 'ARGUS-WP-001',
-                'title': 'WordPress core version disclosed',
-                'severity': 'medium',
-                'confidence': 'high',
-                'description': (
-                    f'WordPress version {version} detected. Version disclosure helps '
-                    'attackers identify known vulnerabilities for targeted exploits.'
-                ),
-                'evidence': {
-                    'type': 'other',
-                    'value': f'Version: {version}',
-                    'context': f'Methods: {[m for m, v in methods_tried if v]}'
-                },
-                'recommendation': (
-                    '1. Update WordPress to latest version\n'
-                    '2. Hide version info by removing generator tags\n'
-                    '3. Restrict access to readme.html and license.txt\n'
-                    '4. Use security plugins to mask WP fingerprints'
-                ),
-                'references': [
-                    'https://wordpress.org/documentation/article/hardening-wordpress/',
-                    'https://developer.wordpress.org/apis/security/'
-                ],
-                'affected_component': f'WordPress Core {version}'
-            })
-            
+            core_finding = self._build_core_version_finding(version, methods_tried)
+            findings.append(core_finding)
             logger.info(f"WordPress version detected: {version}")
         else:
             # Even if version not found, it's good practice
@@ -296,6 +264,104 @@ class WordPressFingerprint:
         
         return None
     
+    def _build_core_version_finding(
+        self,
+        version: str,
+        methods_tried: List[Tuple]
+    ) -> Dict:
+        """
+        Build the ARGUS-WP-001 finding for WP core version disclosure,
+        enriched with CVE data from WPVulnerability.net if available.
+        """
+        base_finding = {
+            'id': 'ARGUS-WP-001',
+            'title': f'WordPress core version disclosed: {version}',
+            'severity': 'medium',
+            'confidence': 'high',
+            'description': (
+                f'WordPress version {version} detected. Version disclosure helps '
+                'attackers identify known vulnerabilities for targeted exploits.'
+            ),
+            'evidence': {
+                'type': 'other',
+                'value': f'Version: {version}',
+                'context': f'Methods: {[m for m, v in methods_tried if v]}',
+            },
+            'recommendation': (
+                '1. Update WordPress to the latest version\n'
+                '2. Remove generator meta tags (use wp_remove_version action)\n'
+                '3. Restrict access to readme.html and license.txt\n'
+                '4. Use a security plugin to mask WP fingerprints'
+            ),
+            'references': [
+                'https://wordpress.org/documentation/article/hardening-wordpress/',
+                'https://developer.wordpress.org/apis/security/',
+            ],
+            'affected_component': f'WordPress Core {version}',
+        }
+
+        # Enrich with CVEs if vuln_db is enabled
+        if not getattr(self.config, 'vuln_db_enabled', True):
+            return base_finding
+
+        try:
+            core_vulns = self.vuln_db.get_core_vulns(version)
+        except Exception as e:
+            logger.debug(f"VulnDB core query failed for {version}: {e}")
+            return base_finding
+
+        if not core_vulns:
+            return base_finding
+
+        # Upgrade finding with CVE data
+        cve_ids = self.vuln_db.extract_cve_ids(core_vulns)
+        severity = self.vuln_db.get_severity_for_vulns(core_vulns)
+        vuln_report = self.vuln_db.format_for_report(core_vulns)
+
+        # Severity is at least 'medium' (version disclosure) — upgrade if CVEs warrant it
+        if severity in ('critical', 'high'):
+            base_finding['severity'] = severity
+
+        cve_label = (
+            f" + {len(cve_ids)} CVE(s): {', '.join(cve_ids[:3])}"
+            + ('...' if len(cve_ids) > 3 else '')
+        ) if cve_ids else ''
+
+        base_finding['title'] = f'Vulnerable WordPress core: {version}{cve_label}'
+        base_finding['description'] = (
+            f'WordPress version {version} is affected by {len(core_vulns)} known '
+            f'vulnerability/vulnerabilities (source: WPVulnerability.net). '
+            + (f'CVEs: {", ".join(cve_ids)}. ' if cve_ids else '')
+            + 'Update WordPress immediately.'
+        )
+        base_finding['recommendation'] = (
+            '1. Update WordPress to the latest version IMMEDIATELY\n'
+            '   → Admin Dashboard → Updates → Update Now\n'
+            '   → Or: wp core update (WP-CLI)\n'
+            '2. Review CVE details in references for specific impact assessment\n'
+            '3. Remove generator meta tags to hide version after update\n'
+            '4. Restrict access to readme.html and license.txt'
+        )
+
+        refs = list(base_finding['references'])
+        refs.append(f'https://www.wpvulnerability.net/core/{version}/')
+        for vid in cve_ids[:5]:
+            refs.append(f'https://www.cve.org/CVERecord?id={vid}')
+        base_finding['references'] = refs
+
+        if cve_ids:
+            base_finding['cve'] = cve_ids
+
+        if vuln_report:
+            base_finding['vulnerabilities'] = vuln_report
+
+        logger.info(
+            f"WordPress core {version}: {len(core_vulns)} vulnerabilities found "
+            f"(CVEs: {', '.join(cve_ids[:3])})"
+        )
+
+        return base_finding
+
     def scan(self, target: str) -> List[Dict]:
         """
         Run full fingerprinting scan.

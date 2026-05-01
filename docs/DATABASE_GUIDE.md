@@ -785,4 +785,4 @@ chmod 644 ~/.argos/argos.db
 
 **Schema Version:** 1.0  
 **Next Update:** v0.3.0 (Interactive CLI - IMPROV-011)
-**Tool Version:** Argus v0.1.0
+**Tool Version:** Argus v0.2.0

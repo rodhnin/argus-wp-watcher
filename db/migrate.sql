@@ -1,5 +1,5 @@
 -- Argos Suite Database Schema (shared by Argus, Hephaestus, Pythia, Asterion)
--- Version: 1
+-- Version: 2
 -- Location: ~/.argos/argos.db
 
 -- ============================================================================
@@ -170,13 +170,39 @@ INSERT OR IGNORE INTO clients (name, domain, contact_email, notes)
 VALUES ('Personal Testing', 'localhost', 'test@localhost', 'Local testing environment');
 
 -- ============================================================================
+-- AI COSTS TABLE (Schema v2 - Block 4 IMPROV-005)
+-- Tracks token usage and cost for every AI analysis call.
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS ai_costs (
+    cost_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    scan_id       INTEGER DEFAULT NULL,
+    provider      TEXT NOT NULL,
+    model         TEXT NOT NULL,
+    analysis_type TEXT NOT NULL,
+    input_tokens  INTEGER NOT NULL DEFAULT 0,
+    output_tokens INTEGER NOT NULL DEFAULT 0,
+    total_tokens  INTEGER NOT NULL DEFAULT 0,
+    cost_usd      REAL NOT NULL DEFAULT 0.0,
+    duration_s    REAL,
+    created_at    TEXT NOT NULL DEFAULT (datetime('now', 'utc')),
+    FOREIGN KEY (scan_id) REFERENCES scans(scan_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_ai_costs_scan_id  ON ai_costs(scan_id);
+CREATE INDEX IF NOT EXISTS idx_ai_costs_provider ON ai_costs(provider);
+CREATE INDEX IF NOT EXISTS idx_ai_costs_created  ON ai_costs(created_at);
+
+-- ============================================================================
 -- MIGRATION NOTES
 -- ============================================================================
--- This schema is version-controlled. For upgrades:
--- 1. Create new migration files: migrate_v1_to_v2.sql
+-- Schema v1: clients, consent_tokens, scans, findings
+-- Schema v2: + ai_costs (Block 4 IMPROV-005, 2026-03-13)
+--
+-- For future upgrades:
+-- 1. Create new migration files: migrate_v2_to_v3.sql
 -- 2. Track version in a separate migrations table
 -- 3. Apply migrations in order
--- 
+--
 -- Future considerations:
 -- - Add indexes as needed based on query patterns
 -- - Partition findings table if it grows large (>100k rows)

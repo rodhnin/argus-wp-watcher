@@ -576,4 +576,4 @@ DELETE FROM consent_tokens WHERE token = 'verify-abc123';
 
 ---
 
-_Argus Version: 0.1.0_
+_Argus Version: 0.2.0_

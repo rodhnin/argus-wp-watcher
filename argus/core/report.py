@@ -13,6 +13,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
+from .owasp import enrich_findings_with_owasp
+
 try:
     import jsonschema
     HAS_JSONSCHEMA = True
@@ -101,21 +103,33 @@ class ReportGenerator:
             }
         )
         
+        md_keys = {'executive_summary', 'technical_remediation', 'agent_analysis'}
+
+        def convert_str(text: str) -> str:
+            html = md.convert(text)
+            md.reset()
+            return html
+
         processed = {}
         for key, value in ai_analysis.items():
-            if key in ['executive_summary', 'technical_remediation'] and isinstance(value, str):
-                # Convert markdown to HTML
-                html_content = md.convert(value)
-                
-                # Reset markdown processor for next conversion
-                md.reset()
-                
-                processed[key] = html_content
-                logger.debug(f"Converted {key} from markdown to HTML ({len(value)} -> {len(html_content)} chars)")
+            if key in md_keys and isinstance(value, str):
+                processed[key] = convert_str(value)
+                logger.debug(f"Converted {key} from markdown to HTML ({len(value)} chars)")
+            elif key == 'results' and isinstance(value, dict):
+                # compare mode: convert per-provider markdown fields
+                converted_results = {}
+                for provider, pdata in value.items():
+                    if isinstance(pdata, dict):
+                        converted_results[provider] = {
+                            k: (convert_str(v) if k in md_keys and isinstance(v, str) else v)
+                            for k, v in pdata.items()
+                        }
+                    else:
+                        converted_results[provider] = pdata
+                processed[key] = converted_results
             else:
-                # Keep other fields as-is (generated_at, model_used, etc.)
                 processed[key] = value
-        
+
         return processed
     
     def create_report(
@@ -145,6 +159,9 @@ class ReportGenerator:
         Returns:
             Report dictionary conforming to schema
         """
+        # Enrich findings with OWASP Top 10 2021 mapping
+        enrich_findings_with_owasp(findings)
+
         # Calculate summary counts
         summary = {
             'critical': 0,
@@ -153,12 +170,12 @@ class ReportGenerator:
             'low': 0,
             'info': 0
         }
-        
+
         for finding in findings:
             severity = finding.get('severity', 'info')
             if severity in summary:
                 summary[severity] += 1
-        
+
         # Build report
         report = {
             'tool': tool,
@@ -310,6 +327,7 @@ class ReportGenerator:
             notes=report.get('notes'),
             consent=report.get('consent'),
             ai=ai_processed,  # <- Processed HTML content
+            diff=report.get('diff'),
             contact=self.config.contact
         )
         

@@ -22,7 +22,7 @@ FROM python:3.11-slim
 # Add metadata
 LABEL maintainer="Rodney Dhavid Jimenez Chacin (rodhnin)"
 LABEL description="Argus - WordPress Security Scanner & Evidence Collector"
-LABEL version="0.1.0"
+LABEL version="0.2.0"
 
 # Create non-root user
 RUN useradd -m -u 1000 argus

@@ -6,7 +6,7 @@ Your task is to generate a TECHNICAL REMEDIATION GUIDE for the engineering team 
 You will receive a JSON report with the following schema:
 - tool: "argus"
 - version: tool version
-- target: scanned URL/domain
+- target: scanned URL/domain (reference this in your guide)
 - date: scan timestamp
 - mode: "safe" or "aggressive"
 - summary: counts by severity (critical, high, medium, low, info)
@@ -20,6 +20,10 @@ You will receive a JSON report with the following schema:
   - references: external links (optional)
   - cve: CVE identifiers (optional)
   - affected_component: specific component (optional)
+
+IMPORTANT: Cover ALL findings from the list — do not omit any finding.
+Cross-reference each finding's 'cve' array when listing CVEs.
+The total finding count is the SUM of all severity levels in the summary field.
 
 ## OUTPUT REQUIREMENTS
 

@@ -54,9 +54,9 @@ extras_require["all"] = list(set(sum(extras_require.values(), [])))
 
 setup(
     name="argus-wp-watcher",
-    version="0.1.0",
+    version="0.2.0",
     author="Rodney Dhavid Jimenez Chacin (rodhnin)",
-    description="WordPress security scanner with AI-powered analysis",
+    description="WordPress security scanner with CVE correlation, OWASP mapping, AI analysis, and scan diffing",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/rodhnin/argus-wp-watcher",
@@ -64,7 +64,7 @@ setup(
         "Contact": "https://rodhnin.com",
         "Bug Reports": "https://github.com/rodhnin/argus-wp-watcher/issues",
         "Source": "https://github.com/rodhnin/argus-wp-watcher",
-        "Documentation": "https://github.com/rodhnin/argus-wp-watcher/tree/main/docs",
+        "Documentation": "https://github.com/rodhnin/argus-wp-watcher#readme",
     },
     packages=find_packages(exclude=["tests", "tests.*", "docker", "examples"]),
     include_package_data=True,
@@ -79,7 +79,7 @@ setup(
         ]
     },
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Information Technology",
         "Intended Audience :: System Administrators",
         "Topic :: Security",

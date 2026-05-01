@@ -233,7 +233,6 @@ class ConfigChecker:
         """
         findings = []
         
-        # Check for debug.log (already checked in files.py but verify here)
         debug_url = urljoin(target, '/wp-content/debug.log')
         
         try:

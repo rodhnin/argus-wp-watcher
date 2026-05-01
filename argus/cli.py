@@ -98,6 +98,12 @@ def create_parser() -> argparse.ArgumentParser:
         metavar='PATH',
         help='SQLite database path (default: ~/.argos/argos.db)'
     )
+    output_group.add_argument(
+        '--diff',
+        metavar='SCAN_ID',
+        help='Compare this scan against a previous scan ID (use "last" for most recent). '
+             'Adds a diff section to the report showing new, fixed, and persisting findings.'
+    )
     
     # Verbosity options
     verbose_group = parser.add_argument_group('Logging & Verbosity')
@@ -148,6 +154,43 @@ def create_parser() -> argparse.ArgumentParser:
         default='OPENAI_API_KEY',
         metavar='VAR',
         help='Environment variable for AI API key [default: OPENAI_API_KEY]'
+    )
+    ai_group.add_argument(
+        '--ai-provider',
+        choices=['openai', 'anthropic', 'ollama'],
+        metavar='PROVIDER',
+        help='AI provider override: openai, anthropic, or ollama'
+    )
+    ai_group.add_argument(
+        '--ai-model',
+        type=str,
+        metavar='MODEL',
+        help='AI model override (e.g. gpt-4o-mini-2024-07-18)'
+    )
+    ai_group.add_argument(
+        '--ai-stream',
+        action='store_true',
+        help='Stream AI output token-by-token in real time'
+    )
+    ai_group.add_argument(
+        '--ai-compare',
+        type=str,
+        metavar='PROVIDERS',
+        help=(
+            'Run analysis through multiple AI providers in parallel and compare results. '
+            'Format: openai,anthropic or openai:gpt-4o-mini,anthropic:claude-3-5-haiku-20241022'
+        )
+    )
+    ai_group.add_argument(
+        '--ai-agent',
+        action='store_true',
+        help='Use AI agent mode with live tool calls: NVD CVE lookup and WPVulnerability.net plugin search'
+    )
+    ai_group.add_argument(
+        '--ai-budget',
+        type=float,
+        metavar='USD',
+        help='Maximum AI cost per scan in USD (enables budget tracking)'
     )
     
     # Consent token options
@@ -204,7 +247,7 @@ def create_parser() -> argparse.ArgumentParser:
         '--rate',
         type=float,
         metavar='RATE',
-        help='Request rate limit (req/sec, default: 3.0 safe, 10.0 aggressive)'
+        help='Request rate limit in req/sec (default: 5.0 safe, 10.0 aggressive)'
     )
     advanced_group.add_argument(
         '--timeout',
@@ -234,10 +277,41 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         '--version',
         action='version',
-        version='%(prog)s 0.1.0'
+        version='%(prog)s 0.2.0'
     )
     
     return parser
+
+
+def _parse_compare_arg(compare_str: str):
+    """
+    Parse --ai-compare argument into list of {provider, model} dicts.
+
+    Formats accepted:
+      "openai,ollama"
+      "openai:gpt-4o-mini-2024-07-18,anthropic:claude-3-5-haiku-20241022"
+      "all"  -> raises ValueError (requires explicit providers)
+    """
+    DEFAULT_MODELS = {
+        'openai':    'gpt-4o-mini-2024-07-18',
+        'anthropic': 'claude-3-5-haiku-20241022',
+        'ollama':    'llama3.2',
+    }
+    providers = []
+    for entry in compare_str.split(','):
+        entry = entry.strip()
+        if ':' in entry:
+            prov, model = entry.split(':', 1)
+        else:
+            prov  = entry
+            model = DEFAULT_MODELS.get(prov, '')
+            if not model:
+                raise ValueError(
+                    f"Unknown provider '{prov}' in --ai-compare. "
+                    f"Supported: {', '.join(DEFAULT_MODELS)}"
+                )
+        providers.append({'provider': prov.strip(), 'model': model.strip()})
+    return providers
 
 
 def handle_gen_consent(args, config: Config):
@@ -368,11 +442,19 @@ def handle_scan(args, config: Config):
         scanner = WordPressScanner(config)
         
         # Run scan
+        # Parse --ai-compare into list of provider configs
+        compare_providers = None
+        if args.use_ai and args.ai_compare:
+            compare_providers = _parse_compare_arg(args.ai_compare)
+
         result = scanner.scan(
             target=args.target,
             mode=mode,
             use_ai=args.use_ai,
-            ai_tone=args.ai_tone if args.use_ai else None
+            ai_tone=args.ai_tone if args.use_ai else None,
+            compare_providers=compare_providers,
+            use_agent=args.ai_agent if args.use_ai else False,
+            diff_scan_id=args.diff if hasattr(args, 'diff') else None,
         )
         
         # Return appropriate exit code based on scan status
@@ -390,9 +472,11 @@ def handle_scan(args, config: Config):
         print("\n" + "="*70)
         print("SCAN COMPLETE")
         print("="*70)
-        print(f"Status: {result['status']}")
+        print(f"Status:   {result['status']}")
         print(f"Findings: {result['findings_count']}")
         print(f"Duration: {result['duration']:.2f}s")
+        if result.get('ai_cost_usd') is not None:
+            print(f"AI Cost:  ${result['ai_cost_usd']:.4f} ({result.get('ai_model', '')})")
         print(f"\nReports generated:")
         print(f"  JSON: {result['report_json']}")
         if result.get('report_html'):
@@ -472,7 +556,26 @@ def main(argv=None):
     
     if args.use_ai:
         cli_overrides.setdefault('ai', {})['enabled'] = True
-    
+
+    if args.ai_provider:
+        cli_overrides.setdefault('ai', {}).setdefault('langchain', {})['provider'] = args.ai_provider
+
+    if args.ai_model:
+        cli_overrides.setdefault('ai', {}).setdefault('langchain', {})['model'] = args.ai_model
+
+    if args.ai_stream:
+        cli_overrides.setdefault('ai', {})['streaming'] = True
+
+    if args.ai_agent:
+        cli_overrides.setdefault('ai', {}).setdefault('agent', {})['enabled'] = True
+
+    if args.ai_budget is not None:
+        if args.ai_budget <= 0:
+            print(f"ERROR: --ai-budget must be a positive number (got {args.ai_budget})")
+            return 1
+        cli_overrides.setdefault('ai', {}).setdefault('budget', {})['enabled'] = True
+        cli_overrides['ai']['budget']['max_cost_per_scan'] = args.ai_budget
+
     config = Config.load(cli_overrides=cli_overrides)
     config.expand_paths()
     config.ensure_directories()

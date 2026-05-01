@@ -57,7 +57,7 @@ class Config:
     # ========================================================================
     
     # General
-    version: str = "0.1.0"
+    version: str = "0.2.0"
     author: str = "Rodney Dhavid Jimenez Chacin (rodhnin)"
     github: str = "https://github.com/rodhnin/argus-wp-watcher"
     contact: Optional[str] = "https://www.rodhnin.com"
@@ -70,11 +70,11 @@ class Config:
     
     # Scan behavior
     default_mode: str = "safe"
-    rate_limit_safe: float = 3.0
+    rate_limit_safe: float = 5.0
     rate_limit_aggressive: float = 10.0
     timeout_connect: int = 10
     timeout_read: int = 30
-    user_agent: str = "Argus/0.1.0 (WordPress Security Scanner; +https://github.com/rodhnin/argus-wp-watcher)"
+    user_agent: str = "Argus/0.2.0 (WordPress Security Scanner; +https://github.com/rodhnin/argus-wp-watcher)"
     follow_redirects: bool = True
     max_redirects: int = 5
     verify_ssl: bool = True
@@ -88,7 +88,8 @@ class Config:
     wp_check_author_idor: bool = True
     wp_check_rest_api: bool = True
     wp_max_users_check: int = 10
-    
+    scan_mode: str = "safe"  # 'safe' or 'aggressive' — set at runtime by scanner
+
     # Consent token
     token_expiry_hours: int = 48
     token_hex_length: int = 16
@@ -113,7 +114,7 @@ class Config:
     # AI integration (LangChain)
     ai_enabled: bool = False
     ai_provider: str = "openai"
-    ai_model: str = "gpt-4-turbo-preview"
+    ai_model: str = "gpt-4o-mini-2024-07-18"
     ai_temperature: float = 0.3
     ai_max_tokens: int = 2000
     ai_agent_type: str = "zero-shot-react-description"
@@ -126,6 +127,18 @@ class Config:
     ai_remove_tokens: bool = True
     ai_remove_credentials: bool = True
     ai_max_evidence_length: int = 500
+    # Ollama server
+    ai_ollama_base_url: str = "http://localhost:11434"
+    # Budget limits (IMPROV-005)
+    ai_budget_enabled: bool = False
+    ai_max_cost_per_scan: float = 0.50
+    ai_warn_threshold: float = 0.80
+    ai_abort_on_exceed: bool = True
+    # Streaming (IMPROV-006)
+    ai_streaming: bool = False
+    # Agent with tools (IMPROV-008)
+    ai_agent_enabled: bool = False
+    ai_agent_max_iterations: int = 5
     
     # Advanced
     max_workers: int = 5
@@ -135,6 +148,11 @@ class Config:
     proxy_http: Optional[str] = None
     proxy_https: Optional[str] = None
     
+    # Vulnerability database (WPVulnerability.net)
+    vuln_db_enabled: bool = True
+    vuln_db_timeout: int = 10
+    vuln_db_cache_ttl: int = 3600
+
     # Docker
     in_container: bool = False
     container_report_dir: Path = Path("/reports")
@@ -298,11 +316,11 @@ class Config:
         # Paths
         if 'paths' in config_dict:
             paths = config_dict['paths']
-            flat['report_dir'] = Path(paths.get('report_dir', cls.report_dir))
-            flat['database'] = Path(paths.get('database', cls.database))
+            flat['report_dir'] = Path(paths.get('report_dir', cls.report_dir)).expanduser()
+            flat['database'] = Path(paths.get('database', cls.database)).expanduser()
             log_file = paths.get('log_file')
-            flat['log_file'] = Path(log_file) if log_file else None
-            flat['consent_proofs_dir'] = Path(paths.get('consent_proofs_dir', cls.consent_proofs_dir))
+            flat['log_file'] = Path(log_file).expanduser() if log_file else None
+            flat['consent_proofs_dir'] = Path(paths.get('consent_proofs_dir', cls.consent_proofs_dir)).expanduser()
         
         # Scan
         if 'scan' in config_dict:
@@ -379,6 +397,7 @@ class Config:
                 flat['ai_temperature'] = lc.get('temperature', cls.ai_temperature)
                 flat['ai_max_tokens'] = lc.get('max_tokens', cls.ai_max_tokens)
                 flat['ai_agent_type'] = lc.get('agent_type', cls.ai_agent_type)
+                flat['ai_ollama_base_url'] = lc.get('ollama_base_url', cls.ai_ollama_base_url)
                 if 'memory' in lc:
                     flat['ai_memory_enabled'] = lc['memory'].get('enabled', cls.ai_memory_enabled)
                     flat['ai_memory_type'] = lc['memory'].get('type', cls.ai_memory_type)
@@ -392,6 +411,17 @@ class Config:
                 flat['ai_remove_tokens'] = san.get('remove_tokens', cls.ai_remove_tokens)
                 flat['ai_remove_credentials'] = san.get('remove_credentials', cls.ai_remove_credentials)
                 flat['ai_max_evidence_length'] = san.get('max_evidence_length', cls.ai_max_evidence_length)
+            if 'budget' in ai:
+                budget = ai['budget']
+                flat['ai_budget_enabled'] = budget.get('enabled', cls.ai_budget_enabled)
+                flat['ai_max_cost_per_scan'] = budget.get('max_cost_per_scan', cls.ai_max_cost_per_scan)
+                flat['ai_warn_threshold'] = budget.get('warn_threshold', cls.ai_warn_threshold)
+                flat['ai_abort_on_exceed'] = budget.get('abort_on_exceed', cls.ai_abort_on_exceed)
+            flat['ai_streaming'] = ai.get('streaming', cls.ai_streaming)
+            if 'agent' in ai:
+                agent_cfg = ai['agent']
+                flat['ai_agent_enabled'] = agent_cfg.get('enabled', cls.ai_agent_enabled)
+                flat['ai_agent_max_iterations'] = agent_cfg.get('max_iterations', cls.ai_agent_max_iterations)
         
         # Advanced
         if 'advanced' in config_dict:
@@ -404,6 +434,13 @@ class Config:
                 flat['proxy_http'] = adv['proxy'].get('http', cls.proxy_http)
                 flat['proxy_https'] = adv['proxy'].get('https', cls.proxy_https)
         
+        # Vulnerability database
+        if 'vuln_db' in config_dict:
+            vdb = config_dict['vuln_db']
+            flat['vuln_db_enabled'] = vdb.get('enabled', cls.vuln_db_enabled)
+            flat['vuln_db_timeout'] = vdb.get('timeout', cls.vuln_db_timeout)
+            flat['vuln_db_cache_ttl'] = vdb.get('cache_ttl', cls.vuln_db_cache_ttl)
+
         # Docker
         if 'docker' in config_dict:
             docker = config_dict['docker']

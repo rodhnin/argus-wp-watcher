@@ -87,23 +87,39 @@ case $choice in
         
         print_info "Deploying Testing Lab (Vulnerable WordPress)..."
         echo ""
-        
+
         cd "$(dirname "$0")"
         mkdir -p ./reports ./data
-        
+
+        # Pull images with retry (network timeouts are common with Docker Hub CDN)
+        print_info "Pulling Docker images (retrying up to 5 times on timeout)..."
+        for img in "wordpress:6.0" "mariadb:10.11"; do
+            if docker image inspect "$img" &>/dev/null; then
+                print_info "  $img already cached — skipping pull"
+                continue
+            fi
+            pulled=false
+            for attempt in 1 2 3 4 5; do
+                print_info "  Pulling $img (attempt $attempt/5)..."
+                if docker pull "$img"; then
+                    pulled=true
+                    break
+                fi
+                print_warning "  Pull failed — waiting 5s before retry..."
+                sleep 5
+            done
+            if [ "$pulled" = false ]; then
+                print_error "Failed to pull $img after 5 attempts. Check your internet connection."
+                exit 1
+            fi
+        done
+
         docker compose -f compose.testing.yml up -d
-        
+
         echo ""
-        print_success "Testing Lab deployed successfully!"
+        print_info "Containers started. Running lab setup (installs WP + vulnerable plugins)..."
         echo ""
-        print_info "WordPress will be available at: http://localhost:8080"
-        print_info "Initial setup may take 60-90 seconds..."
-        echo ""
-        print_info "Check status:"
-        echo "  docker compose -f compose.testing.yml ps"
-        echo ""
-        print_info "Scan from host:"
-        echo "  python -m argus --target http://localhost:8080"
+        bash "$(dirname "$0")/setup-lab.sh"
         ;;
         
     3)
@@ -119,32 +135,56 @@ case $choice in
         
         print_info "Deploying both Production and Testing Lab..."
         echo ""
-        
+
         cd "$(dirname "$0")"
         mkdir -p ./reports ./data
-        
+
+        # Pull images with retry
+        print_info "Pulling Docker images (retrying up to 5 times on timeout)..."
+        for img in "wordpress:6.0" "mariadb:10.11"; do
+            if docker image inspect "$img" &>/dev/null; then
+                print_info "  $img already cached — skipping pull"
+                continue
+            fi
+            pulled=false
+            for attempt in 1 2 3 4 5; do
+                print_info "  Pulling $img (attempt $attempt/5)..."
+                if docker pull "$img"; then
+                    pulled=true
+                    break
+                fi
+                print_warning "  Pull failed — waiting 5s before retry..."
+                sleep 5
+            done
+            if [ "$pulled" = false ]; then
+                print_error "Failed to pull $img after 5 attempts. Check your internet connection."
+                exit 1
+            fi
+        done
+
         # Start testing lab first (creates network)
         print_info "Starting Testing Lab..."
         docker compose -f compose.testing.yml up -d
-        
+
+        print_info "Running lab setup..."
+        bash "$(dirname "$0")/setup-lab.sh"
+
         # Start production scanner
         print_info "Starting Argus Scanner..."
         docker compose up -d
-        
+
         # Connect Argus to testing network
         print_info "Connecting Argus to testing network..."
         docker network connect argus-test-network argus-scanner 2>/dev/null || true
-        
+
         echo ""
         print_success "Both environments deployed successfully!"
         echo ""
         print_info "Production Scanner:"
         echo "  docker compose exec argus python -m argus --target <URL>"
         echo ""
-        print_info "Testing Lab:"
-        echo "  WordPress: http://localhost:8080"
-        echo ""
-        print_info "Scan test lab from container:"
+        print_info "Testing Lab: http://localhost:8080"
+        print_info "Scan from container:"
         echo "  docker compose exec argus python -m argus --target http://wordpress"
         ;;
         

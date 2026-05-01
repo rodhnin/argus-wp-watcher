@@ -278,33 +278,189 @@ class UserEnumerator:
         
         return None
     
+    def enumerate_via_oembed(self, target: str) -> List[Dict]:
+        """
+        Enumerate users via WordPress oEmbed API endpoint.
+        Queries /wp-json/wp/v2/posts then embeds each post URL to extract author_name.
+        """
+        users = []
+        try:
+            posts_url = urljoin(target, '/wp-json/wp/v2/posts?per_page=5')
+            resp = self.session.get(posts_url)
+            if resp.status_code != 200:
+                return users
+            posts = resp.json()
+            if not isinstance(posts, list):
+                return users
+            for post in posts[:5]:
+                post_link = post.get('link', '')
+                if not post_link:
+                    continue
+                oembed_url = urljoin(target, f'/wp-json/oembed/1.0/embed?url={post_link}')
+                try:
+                    oembed_resp = self.session.get(oembed_url)
+                    if oembed_resp.status_code == 200:
+                        data = oembed_resp.json()
+                        author = data.get('author_name', '')
+                        if author and author not in [u['username'] for u in users]:
+                            users.append({'username': author, 'method': 'oembed', 'url': oembed_url})
+                            logger.info(f"✓ User found via oEmbed: {author}")
+                except Exception:
+                    pass
+        except Exception as e:
+            logger.debug(f"oEmbed enumeration failed: {e}")
+        return users
+
+    def enumerate_via_login_error(self, target: str) -> List[Dict]:
+        """
+        Enumerate users by differentiating WordPress login error messages.
+        WP returns different errors for invalid username vs wrong password,
+        allowing confirmation of which usernames exist.
+        """
+        users = []
+        login_url = urljoin(target, '/wp-login.php')
+        common_usernames = [
+            'admin', 'administrator', 'user', 'test', 'demo',
+            'editor', 'author', 'webmaster', 'wordpress', 'wp',
+            'manager', 'support', 'info', 'contact', 'root',
+        ]
+        try:
+            for username in common_usernames:
+                resp = self.session.post(login_url, data={
+                    'log': username,
+                    'pwd': 'argus_probe_xyz_not_real_9182736',
+                    'wp-submit': 'Log In',
+                    'redirect_to': '/wp-admin/',
+                    'testcookie': '1',
+                }, allow_redirects=True)
+                text_lower = resp.text.lower()
+                # WP shows "password you entered" when username IS valid
+                if ('password you entered' in text_lower or
+                        'incorrect password' in text_lower or
+                        'the password field is empty' in text_lower):
+                    if username not in [u['username'] for u in users]:
+                        users.append({'username': username, 'method': 'login_error', 'url': login_url})
+                        logger.info(f"✓ User found via login error differentiation: {username}")
+        except Exception as e:
+            logger.debug(f"Login error enumeration failed: {e}")
+        return users
+
+    def enumerate_via_xmlrpc(self, target: str) -> List[Dict]:
+        """
+        Enumerate users via XML-RPC user probe.
+        Sends system.listMethods first to verify XML-RPC is active and
+        wp.getUsersBlogs is available, then probes common usernames.
+        WordPress returns Error 403 "incorrect_password" for valid users
+        and "invalid_username" for non-existent users.
+        """
+        users = []
+        xmlrpc_url = urljoin(target, '/xmlrpc.php')
+        common_usernames = [
+            'admin', 'administrator', 'webmaster', 'user', 'editor',
+            'author', 'moderator', 'support', 'contact', 'info',
+            'owner', 'manager', 'root', 'test', 'wordpress',
+        ]
+
+        logger.info("Enumerating via XML-RPC user probe")
+
+        try:
+            # Step 1: verify XML-RPC is active and wp.getUsersBlogs is available
+            list_methods_payload = (
+                '<?xml version="1.0"?>'
+                '<methodCall>'
+                '<methodName>system.listMethods</methodName>'
+                '<params></params>'
+                '</methodCall>'
+            )
+            resp = self.session.post(
+                xmlrpc_url,
+                data=list_methods_payload,
+                headers={'Content-Type': 'text/xml'},
+            )
+            if resp.status_code != 200:
+                logger.debug(f"XML-RPC not available (HTTP {resp.status_code})")
+                return users
+            if 'wp.getUsersBlogs' not in resp.text:
+                logger.debug("XML-RPC active but wp.getUsersBlogs not listed")
+                return users
+
+            # Step 2: probe each username
+            for username in common_usernames:
+                probe_payload = (
+                    '<?xml version="1.0"?>'
+                    '<methodCall>'
+                    '<methodName>wp.getUsersBlogs</methodName>'
+                    '<params>'
+                    '<param><value><string>{username}</string></value></param>'
+                    '<param><value><string>argus_probe_xyz_not_real_9182736</string></value></param>'
+                    '</params>'
+                    '</methodCall>'
+                ).format(username=username)
+                try:
+                    probe_resp = self.session.post(
+                        xmlrpc_url,
+                        data=probe_payload,
+                        headers={'Content-Type': 'text/xml'},
+                    )
+                    resp_text = probe_resp.text
+                    # WordPress returns "incorrect_password" when username IS valid
+                    if 'incorrect_password' in resp_text:
+                        if username not in [u['username'] for u in users]:
+                            users.append({
+                                'username': username,
+                                'method': 'xmlrpc_probe',
+                                'url': xmlrpc_url,
+                            })
+                            logger.info(f"✓ User found via XML-RPC probe: {username}")
+                    # "invalid_username" means user does not exist — skip silently
+                except Exception:
+                    pass
+
+        except Exception as e:
+            logger.debug(f"XML-RPC enumeration failed: {e}")
+
+        return users
+
     def scan(self, target: str) -> List[Dict]:
         """
         Run full user enumeration scan.
-        
+
         Args:
             target: Target URL
-        
+
         Returns:
             List of findings
         """
         findings = []
         all_users = []
-        
+
         # Method 1: Author IDOR
         if self.config.wp_check_author_idor:
             idor_users = self.enumerate_via_author_idor(target)
             all_users.extend(idor_users)
-        
+
         # Method 2: REST API
         if self.config.wp_check_rest_api:
             rest_users = self.enumerate_via_rest_api(target)
             all_users.extend(rest_users)
-        
+
         # Method 3: From posts
         post_users = self.enumerate_from_posts(target)
         all_users.extend(post_users)
-        
+
+        # Method 4 (aggressive): oEmbed
+        if getattr(self.config, 'scan_mode', 'safe') == 'aggressive':
+            oembed_users = self.enumerate_via_oembed(target)
+            all_users.extend(oembed_users)
+
+            # Method 5 (aggressive): Login error differentiation
+            login_users = self.enumerate_via_login_error(target)
+            all_users.extend(login_users)
+
+            # Method 6 (aggressive): XML-RPC user probe
+            xmlrpc_users = self.enumerate_via_xmlrpc(target)
+            all_users.extend(xmlrpc_users)
+
         # Deduplicate users
         unique_users = {}
         for user in all_users:

@@ -9,19 +9,33 @@ The AI assistant generates two types of analysis from scan results:
 1. **Executive Summary** (non-technical) - For business stakeholders, managers, C-suite
 2. **Technical Remediation Guide** - For developers, system administrators, security engineers
 
-Both are generated from the JSON scan report using carefully crafted prompts and sanitized input.
+**New in v0.2.0:**
+
+- Cost tracking and budget enforcement (`--ai-budget`)
+- Streaming output (`--ai-stream`)
+- Multi-LLM comparison mode (`--ai-compare`)
+- AI Agent with external tools: NVD CVE lookup + WPVulnerability.net (`--ai-agent`)
+
+Both analyses are generated from the JSON scan report using carefully crafted prompts and sanitized input.
 
 ---
 
-## 🧪 Testing AI Integration
+## Testing AI Integration
 
 ### Standalone Test Module
 
-Argus includes a built-in test module to verify AI provider configuration before running full scans:
-
 ```bash
-# Test OpenAI (default)
+# Test with default provider (OpenAI, basic mode)
 python -m argus.core.ai openai
+
+# Test streaming output
+python -m argus.core.ai openai stream
+
+# Test agent mode with tools
+python -m argus.core.ai openai agent
+
+# Test compare mode (single provider, for unit testing)
+python -m argus.core.ai openai compare
 
 # Test Anthropic Claude
 python -m argus.core.ai anthropic
@@ -30,16 +44,14 @@ python -m argus.core.ai anthropic
 python -m argus.core.ai ollama
 ```
 
-This test will:
+This test verifies:
 
-1. Initialize the AI provider
-2. Verify API keys/connectivity
-3. Test report sanitization
-4. Generate sample executive summary
-5. Generate sample technical guide
-6. Report success/failure with diagnostics
-
-**Use this test to verify your AI setup is working before running production scans.**
+1. AI provider initialization
+2. API key / connectivity
+3. Report sanitization (consent removal, token redaction)
+4. Executive summary generation
+5. Technical guide generation
+6. Cost tracking output
 
 ---
 
@@ -48,7 +60,7 @@ This test will:
 ### Required Dependencies
 
 ```bash
-# Core LangChain v1.0.0
+# Core LangChain
 pip install langchain-core==1.0.0
 
 # For OpenAI
@@ -62,8 +74,6 @@ pip install "langchain-ollama>=0.3.0,<0.4.0"
 ```
 
 ### API Keys
-
-Set your API key as an environment variable:
 
 ```bash
 # OpenAI (default)
@@ -79,22 +89,36 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 
 ## Configuration
 
-### ⚠️ IMPORTANT: Provider Switching (v0.1.0)
+### Provider & Model Selection (v0.2.0+)
 
-**Current Method:** Provider selection is configured in `config/defaults.yaml`.
+Provider and model can now be set at runtime via CLI flags:
 
-**To switch providers, you must edit the YAML file directly:**
+```bash
+# Use default (gpt-4o-mini-2024-07-18 via OpenAI)
+python -m argus --target https://example.com --use-ai
+
+# Override provider
+python -m argus --target https://example.com --use-ai --ai-provider anthropic
+
+# Override model
+python -m argus --target https://example.com --use-ai --ai-model gpt-4o
+
+# Override both
+python -m argus --target https://example.com \
+  --use-ai \
+  --ai-provider anthropic \
+  --ai-model claude-3-5-haiku-20241022
+```
+
+Or edit `config/defaults.yaml` to change the default:
 
 ```yaml
 ai:
     langchain:
-        provider: "openai" # Change this to: openai, anthropic, or ollama
-        model: "gpt-4-turbo-preview" # Update model based on provider
+        provider: "openai"
+        model: "gpt-4o-mini-2024-07-18" # default (v0.2.0+)
         temperature: 0.3
         max_tokens: 2000
-
-        # For Ollama only - add this section:
-        ollama_base_url: "http://localhost:11434"
 ```
 
 ### Provider-Specific Configuration
@@ -105,7 +129,7 @@ ai:
 ai:
     langchain:
         provider: "openai"
-        model: "gpt-4-turbo-preview" # or gpt-4, gpt-3.5-turbo
+        model: "gpt-4o-mini-2024-07-18" # recommended: cheap + high quality
     api_key_env: "OPENAI_API_KEY"
 ```
 
@@ -115,7 +139,7 @@ ai:
 ai:
     langchain:
         provider: "anthropic"
-        model: "claude-3-5-sonnet-20241022" # or claude-3-opus, claude-3-haiku
+        model: "claude-3-5-haiku-20241022" # fast + cheap
     api_key_env: "ANTHROPIC_API_KEY"
 ```
 
@@ -125,42 +149,163 @@ ai:
 ai:
     langchain:
         provider: "ollama"
-        model: "llama3.2" # or whatever model you have pulled
+        model: "llama3.2"
         ollama_base_url: "http://localhost:11434"
-    # No API key needed for Ollama
+    # No API key needed
 ```
-
-### Future Enhancement (v0.3.0)
-
-In version 0.3.0, I will implement an interactive configuration system similar to Metasploit:
-
--   Dynamic provider switching without editing YAML
--   Runtime model selection
--   Interactive configuration menu
--   Profile management for different scenarios
-
-For now, manual YAML editing is required for provider switching.
 
 ---
 
-## Usage
+## Usage — All CLI Flags
 
-### Basic AI Analysis
+### Basic Analysis
 
 ```bash
-# 1. Configure provider in config/defaults.yaml (see above)
+# Both executive summary + technical guide (default)
+python -m argus --target https://example.com --use-ai
 
-# 2. Verify domain consent
-python -m argus --gen-consent example.com
-python -m argus --verify-consent http --domain example.com --token verify-abc123
-
-# 3. Run scan with AI
-python -m argus --target https://example.com --use-ai --html
-
-# Different analysis tones
+# Technical only (for engineers, cheaper)
 python -m argus --target https://example.com --use-ai --ai-tone technical
+
+# Executive only (for managers)
 python -m argus --target https://example.com --use-ai --ai-tone non_technical
 ```
+
+### Streaming Output
+
+```bash
+# Stream tokens to terminal in real time
+python -m argus --target https://example.com --use-ai --ai-stream
+
+# Combined with verbose to see all details
+python -m argus --target https://example.com --use-ai --ai-stream -vv
+```
+
+### Agent Mode with External Tools
+
+```bash
+# Agent mode: calls NVD + WPVulnerability.net before writing analysis
+python -m argus --target https://example.com --use-ai --ai-agent
+```
+
+Agent mode performs:
+
+1. Calls `lookup_nvd_cve()` for each CVE in critical/high findings
+2. Calls `search_wp_plugin_vulns()` for each vulnerable plugin
+3. Generates enriched analysis with real CVSS scores and vulnerability counts
+
+### Multi-LLM Comparison
+
+```bash
+# Compare OpenAI vs Anthropic (uses default model per provider)
+python -m argus --target https://example.com \
+  --use-ai \
+  --ai-compare openai,anthropic
+
+# Compare specific models
+python -m argus --target https://example.com \
+  --use-ai \
+  --ai-compare "openai:gpt-4o-mini-2024-07-18,anthropic:claude-3-5-haiku-20241022"
+
+# Technical only comparison
+python -m argus --target https://example.com \
+  --use-ai \
+  --ai-compare openai,anthropic \
+  --ai-tone technical
+```
+
+Results appear in `report.ai_analysis.results` keyed by `"provider/model"`.
+
+### Budget Control
+
+```bash
+# Set maximum spend per scan (enables budget tracking)
+python -m argus --target https://example.com --use-ai --ai-budget 0.05
+
+# Budget abort: AI analysis stops when cost exceeds limit
+# Warning shown at 80% of budget (configurable)
+```
+
+```yaml
+# config/defaults.yaml
+ai:
+    budget:
+        enabled: true
+        max_cost_per_scan: 0.50 # USD
+        warn_threshold: 0.80 # warn at 80%
+        abort_on_exceed: true
+```
+
+### Custom API Key Environment Variable
+
+```bash
+export MY_OPENAI_KEY="sk-..."
+python -m argus --target https://example.com \
+  --use-ai \
+  --api-key-env MY_OPENAI_KEY
+```
+
+---
+
+## Cost Tracking
+
+Every AI scan automatically records costs:
+
+**In DB** (`~/.argos/argos.db`, table `ai_costs`):
+
+```sql
+SELECT provider, model, analysis_type, input_tokens, output_tokens, cost_usd
+FROM ai_costs
+ORDER BY created_at DESC
+LIMIT 10;
+```
+
+**In JSON** (`~/.argos/costs.json`):
+
+```json
+{
+    "scans": [
+        {
+            "scan_id": 16,
+            "provider": "openai",
+            "model": "gpt-4o-mini-2024-07-18",
+            "breakdown": {
+                "non_technical": { "input_tokens": 16496, "output_tokens": 706, "cost_usd": 0.002898 },
+                "technical": { "input_tokens": 16290, "output_tokens": 1642, "cost_usd": 0.003429 }
+            },
+            "total_cost_usd": 0.006327
+        }
+    ],
+    "totals": {
+        "total_scans": 14,
+        "total_cost_usd": 0.5667,
+        "monthly_projection": 1.21
+    }
+}
+```
+
+---
+
+## Verified Pricing Table (2026-04-15)
+
+Prices are USD per 1,000,000 tokens. Source: LiteLLM model_prices_and_context_window.json.
+
+| Provider  | Model                             | Input/1M | Output/1M | Typical scan |
+| --------- | --------------------------------- | -------- | --------- | ------------ |
+| openai    | gpt-4o-mini-2024-07-18 (default)  | $0.15    | $0.60     | ~$0.006      |
+| openai    | gpt-4o-mini                       | $0.15    | $0.60     | ~$0.006      |
+| openai    | gpt-4o / gpt-4o-2024-11-20        | $2.50    | $10.00    | ~$0.05       |
+| openai    | gpt-4-turbo / gpt-4-turbo-preview | $10.00   | $30.00    | ~$0.37       |
+| openai    | gpt-3.5-turbo                     | $0.50    | $1.50     | ~$0.01       |
+| anthropic | claude-3-5-sonnet-20241022        | $3.00    | $15.00    | ~$0.06       |
+| anthropic | claude-3-5-haiku-20241022         | $0.80    | $4.00     | ~$0.02       |
+| anthropic | claude-3-haiku-20240307           | $0.25    | $1.25     | ~$0.006      |
+| anthropic | claude-3-opus-20240229            | $15.00   | $75.00    | ~$0.30       |
+| anthropic | claude-opus-4-5                   | $5.00    | $25.00    | ~$0.10       |
+| anthropic | claude-sonnet-4-5                 | $3.00    | $15.00    | ~$0.06       |
+| ollama    | (any local model)                 | $0.00    | $0.00     | Free         |
+
+Unknown models: cost recorded as $0.00 with a warning log entry.
 
 ---
 
@@ -168,301 +313,193 @@ python -m argus --target https://example.com --use-ai --ai-tone non_technical
 
 ### Data Sanitization
 
-Before sending reports to AI, Argus automatically removes sensitive information. The sanitization system is continuously improving based on real-world testing.
+Before sending to AI, Argus automatically removes:
 
-**What Gets Removed:**
+- Consent tokens (`verify-abc123...`)
+- Bearer tokens and API keys
+- Database passwords and credentials
+- Long evidence snippets (truncated to 500 chars)
 
--   ✅ Consent tokens (`verify-abc123...`)
--   ✅ Bearer tokens and API keys
--   ✅ Passwords and credentials
--   ✅ Cookie values and session IDs
--   ✅ Long evidence snippets (truncated to 500 chars)
-
-**What Gets Sent (Sanitized):**
-
--   Finding IDs and titles
--   Severity levels
--   Redacted/truncated evidence
--   Generic recommendations
--   External reference URLs
+Additionally, `_total_findings` is computed and injected into the sanitized summary to help the LLM count correctly — this field is never persisted to the output report.
 
 ### Privacy Recommendations
 
-| Concern Level        | Recommended Provider | Why                                             |
-| -------------------- | -------------------- | ----------------------------------------------- |
-| **High Privacy**     | Ollama (local)       | Data never leaves your machine                  |
-| **Moderate Privacy** | Anthropic Claude     | Strong privacy policy, no training on user data |
-| **Standard**         | OpenAI GPT-4         | Best analysis quality, standard privacy         |
-
-⚠️ **Note on Ollama:** While 100% private, local models may generate less accurate analysis for complex reports. Best for sensitive environments where privacy is paramount.
+| Concern              | Provider         | Reason                         |
+| -------------------- | ---------------- | ------------------------------ |
+| **High Privacy**     | Ollama (local)   | Data never leaves machine      |
+| **Moderate Privacy** | Anthropic Claude | Strong privacy policy          |
+| **Standard**         | OpenAI GPT       | Best quality, standard privacy |
 
 ---
 
-## Providers Comparison
+## Provider Comparison
 
-### OpenAI GPT-4 (Default)
+| Provider                     | Speed (both modes) | Quality    | Cost/scan | Privacy      |
+| ---------------------------- | ------------------ | ---------- | --------- | ------------ |
+| OpenAI gpt-4o-mini (default) | ~40s               | ⭐⭐⭐⭐⭐ | ~$0.006   | Standard     |
+| OpenAI gpt-4o                | ~40s               | ⭐⭐⭐⭐⭐ | ~$0.05    | Standard     |
+| OpenAI gpt-4-turbo           | ~40s               | ⭐⭐⭐⭐⭐ | ~$0.37    | Standard     |
+| Anthropic claude-3-5-haiku   | ~55s               | ⭐⭐⭐⭐⭐ | ~$0.02    | Enhanced     |
+| Ollama llama3.2 (CPU)        | ~28min             | ⭐⭐⭐     | Free      | 100% offline |
 
-**Pros:**
-
--   Best analysis quality
--   Extensive WordPress knowledge
--   Fast response (20-30s)
--   Handles complex reports well
-
-**Cons:**
-
--   Requires internet
--   Costs money ($0.10-0.30/scan)
--   Data sent to OpenAI servers
-
-**Best For:** Production reports, client deliverables, complex findings
-
-### Anthropic Claude
-
-**Pros:**
-
--   Strong technical reasoning
--   Good with code analysis
--   Privacy-focused company
--   Competitive pricing
-
-**Cons:**
-
--   Requires internet
--   Costs money ($0.15-0.45/scan)
--   Slightly slower than GPT-4
-
-**Best For:** Technical deep-dives, code-heavy findings, EU clients (privacy)
-
-### Ollama (Local Models)
-
-**Pros:**
-
--   100% offline operation
--   Complete privacy (no data leaves machine)
--   Free (no API costs)
--   No internet required
-
-**Cons:**
-
--   Lower quality analysis
--   Very slow without GPU (10-30 minutes)
--   May struggle with complex reports
--   Requires local setup
-
-**Best For:** Sensitive environments, air-gapped networks, learning/testing
-
-### Performance Comparison
-
-| Provider         | Executive Summary | Technical Guide | Total Time | Quality    |
-| ---------------- | ----------------- | --------------- | ---------- | ---------- |
-| OpenAI GPT-4     | ~15s              | ~20s            | ~35s       | ⭐⭐⭐⭐⭐ |
-| Anthropic Claude | ~20s              | ~25s            | ~45s       | ⭐⭐⭐⭐⭐ |
-| Ollama (CPU)     | ~14min            | ~14min          | ~28min     | ⭐⭐⭐     |
-| Ollama (GPU)     | ~30s              | ~45s            | ~75s       | ⭐⭐⭐     |
+**Recommendation:** Use `gpt-4o-mini-2024-07-18` (default). It provides the same structured output quality as gpt-4-turbo at 1/67th of the cost (~$0.006 vs $0.37 per scan).
 
 ---
 
 ## Ollama Setup Guide
 
-For **offline operation** with local models:
-
 ```bash
 # 1. Install Ollama
 curl -fsSL https://ollama.com/install.sh | sh
 
-# 2. Start Ollama server
+# 2. Start server
 ollama serve &
 
-# 3. Pull a model (llama3.2 recommended for balance)
+# 3. Pull a model
 ollama pull llama3.2
 
-# 4. Verify it's working
-ollama list
-curl http://localhost:11434/api/tags
-
-# 5. Update config/defaults.yaml
-ai:
-  langchain:
-    provider: "ollama"
-    model: "llama3.2:latest"
-    ollama_base_url: "http://localhost:11434"
-
-# 6. Test the integration
+# 4. Test
 python -m argus.core.ai ollama
 
-# 7. Run a scan
-python -m argus --target http://localhost:8080 --use-ai --html
+# 5. Run scan
+python -m argus --target http://localhost:8080 --use-ai --ai-provider ollama --html
 ```
-
-**Recommended Models:**
-
--   `llama3.2` - Best balance (3.9GB)
--   `mistral` - Good for code (4.1GB)
--   `codellama` - Technical focus (3.8GB)
--   `phi3` - Smallest/fastest (2.2GB)
 
 ---
 
 ## Custom Prompts
 
-Prompts are stored in `config/prompts/`:
+Stored in `config/prompts/`:
 
-### Technical Prompt (`technical.txt`)
+- **`technical.txt`** — Step-by-step remediation with WP-CLI commands, code snippets, 7 sections (executive summary, critical findings, high findings, medium/low, action plan, hardening, references)
+- **`non_technical.txt`** — Business-level summary in plain language (overall assessment, key risks, immediate actions, long-term recommendations, positive notes)
 
--   Step-by-step remediation
--   Risk assessments
--   Command examples
--   Verification methods
+Edit these files to customize AI output for your organization's needs.
 
-### Non-Technical Prompt (`non_technical.txt`)
+---
 
--   Business impact
--   Plain language
--   Executive actions
--   Timeline recommendations
+## LangChain Compatibility Note
 
-Edit these files to customize AI output for your needs.
+Tested with: `langchain==1.2.12`, `langchain-core==1.2.19`
+
+**Agent mode uses manual bind_tools loop** (not `create_tool_calling_agent` which was removed in langchain 1.x):
+
+```python
+from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
+
+llm_with_tools = llm.bind_tools(tools)
+messages = [SystemMessage(content=system_prompt), HumanMessage(content=report_json)]
+
+while iteration < max_iterations:
+    response = llm_with_tools.invoke(messages)
+    messages.append(response)
+    if not getattr(response, 'tool_calls', []):
+        break  # LLM is done
+    for tc in response.tool_calls:
+        output = str(tools_by_name[tc['name']].invoke(tc['args']))
+        messages.append(ToolMessage(content=output, tool_call_id=tc['id']))
+```
 
 ---
 
 ## Troubleshooting
 
-### Provider Not Working?
-
-Run the standalone test:
+### "API key not found"
 
 ```bash
-python -m argus.core.ai [provider_name]
+echo $OPENAI_API_KEY   # For OpenAI
+echo $ANTHROPIC_API_KEY # For Anthropic
 ```
 
-This will tell you exactly what's wrong.
+### "Ollama server not responding"
 
-### Common Issues
+```bash
+ollama serve
+curl http://localhost:11434/api/tags
+```
 
-#### "API key not found"
+### "Model not found" (Ollama)
 
--   Check environment variable is set
--   For OpenAI: `echo $OPENAI_API_KEY`
--   For Anthropic: `echo $ANTHROPIC_API_KEY`
+```bash
+ollama pull llama3.2
+ollama list
+```
 
-#### "Ollama server not responding"
+### AI analysis slow
 
--   Start server: `ollama serve`
--   Check it's running: `ps aux | grep ollama`
--   Verify port: `curl http://localhost:11434/api/tags`
+- Use `--ai-stream` to see progress while waiting
+- Use `--ai-tone technical` (one analysis instead of two) to halve time
 
-#### "Model not found" (Ollama)
+### Budget exceeded
 
--   Pull the model: `ollama pull llama3.2`
--   List models: `ollama list`
--   Update defaults.yaml with correct model name
+- Increase `--ai-budget 0.10` limit
+- Or use cheaper model: `--ai-model gpt-4o-mini-2024-07-18`
 
-#### "Rate limit exceeded"
+### Cost recorded as $0.00
 
--   Reduce max_tokens in config
--   Wait and retry
--   Use --ai-tone technical (smaller output)
-
-#### "AI analysis failed"
-
-1. Run standalone test: `python -m argus.core.ai [provider]`
-2. Check provider configuration in defaults.yaml
-3. Verify API keys/connectivity
-4. Try with a simpler report (fewer findings)
-
----
-
-## Cost Management
-
-### Token Usage Estimates
-
-| Report Size           | Input Tokens | Output Tokens | OpenAI Cost | Anthropic Cost |
-| --------------------- | ------------ | ------------- | ----------- | -------------- |
-| Small (10 findings)   | ~1,500       | ~1,000        | ~$0.05      | ~$0.08         |
-| Medium (50 findings)  | ~3,000       | ~2,000        | ~$0.15      | ~$0.20         |
-| Large (100+ findings) | ~5,000       | ~3,000        | ~$0.25      | ~$0.35         |
-
-**Cost Reduction Tips:**
-
--   Use `--ai-tone technical` OR `non_technical` (not both)
--   Enable max_evidence_length truncation
--   Use GPT-3.5-turbo for quick analysis
--   Use Ollama for testing/development
-
----
-
-## Best Practices
-
-### 1. Choose Right Provider for Context
-
-| Scenario         | Recommended Provider | Reason          |
-| ---------------- | -------------------- | --------------- |
-| Client reports   | OpenAI GPT-4         | Best quality    |
-| Internal testing | Ollama               | Free, private   |
-| Quick analysis   | GPT-3.5-turbo        | Fast & cheap    |
-| Sensitive data   | Ollama               | 100% offline    |
-| EU/GDPR clients  | Anthropic            | Privacy-focused |
-
-### 2. Review AI Output
-
-**Always verify:**
-
--   Technical commands are correct
--   Version numbers are accurate
--   Remediation steps are complete
--   No hallucinated CVEs or references
-
-### 3. Optimize for Your Use Case
-
--   Production: Quality over speed (GPT-4)
--   Development: Speed over quality (Ollama)
--   Budget-conscious: Balance (GPT-3.5-turbo)
+- Unknown model: check model name is in the pricing table
+- Streaming mode: token count is estimated (normal behavior)
 
 ---
 
 ## Examples
 
-### Full Workflow with Provider Testing
+### Full Production Workflow
 
 ```bash
-# 1. Test providers to see which works best
-python -m argus.core.ai openai    # Test OpenAI
-python -m argus.core.ai anthropic # Test Anthropic
-python -m argus.core.ai ollama    # Test Ollama
+# 1. Test AI setup
+python -m argus.core.ai openai
 
-# 2. Choose provider and update config/defaults.yaml
-vim config/defaults.yaml
-# Set: provider: "anthropic"
+# 2. Generate consent + verify
+python -m argus --gen-consent example.com
+python -m argus --verify-consent http --domain example.com --token verify-abc123
 
-# 3. Generate consent token
-python -m argus --gen-consent mysite.com
-
-# 4. Verify ownership
-python -m argus --verify-consent http --domain mysite.com --token verify-abc123
-
-# 5. Run scan with chosen provider
+# 3. Run scan with AI
 python -m argus \
-  --target https://mysite.com \
+  --target https://example.com \
   --use-ai \
   --ai-tone both \
   --html \
   -vv
 
-# 6. Check report
-open ~/.argus/reports/argus_report_mysite.com_*.html
+# 4. Check cost
+cat ~/.argos/costs.json | python -m json.tool
+```
+
+### Agent Mode with Budget
+
+```bash
+# Agent mode with $0.05 budget limit
+python -m argus \
+  --target http://localhost:8080 \
+  --use-ai \
+  --ai-agent \
+  --ai-budget 0.05 \
+  --html \
+  -vv
+```
+
+### Multi-Provider Comparison
+
+```bash
+# Compare 3 providers side by side
+python -m argus \
+  --target http://localhost:8080 \
+  --use-ai \
+  --ai-compare "openai:gpt-4o-mini-2024-07-18,anthropic:claude-3-5-haiku-20241022" \
+  --ai-tone technical \
+  --html
 ```
 
 ---
 
 ## Support
 
--   📖 [LangChain v1.0 Docs](https://python.langchain.com/docs/)
--   🤖 [OpenAI Platform](https://platform.openai.com/)
--   🔍 [Anthropic Claude](https://docs.anthropic.com/)
--   🦙 [Ollama](https://ollama.com/)
+- LangChain Docs: https://python.langchain.com/docs/
+- OpenAI Platform: https://platform.openai.com/
+- Anthropic Claude: https://docs.anthropic.com/
+- Ollama: https://ollama.com/
+- NVD CVE API: https://nvd.nist.gov/developers/vulnerabilities
+- WPVulnerability.net: https://www.wpvulnerability.net/
 
-For Argus AI issues:
-
--   GitHub: https://github.com/rodhnin/argus-wp-watcher/issues
--   Website: https://rodhnin.com
+For Argus AI issues: https://github.com/rodhnin/argus-wp-watcher/issues

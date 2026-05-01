@@ -246,7 +246,8 @@ def create_http_client(mode: str = 'safe', config=None) -> RateLimitedSession:
     else:
         rate_limit = config.rate_limit_safe
     
+    aggressive_threads = max(config.max_workers, 10) if mode == 'aggressive' else config.max_workers
     logger.info(f"HTTP client mode: {mode}, rate limit: {rate_limit:.2f} req/s")
-    logger.info(f"Thread pool size: {config.max_workers} workers")
+    logger.info(f"Thread pool size: {aggressive_threads} workers ({config.max_workers} configured)")
     
     return RateLimitedSession(rate_limit, config)

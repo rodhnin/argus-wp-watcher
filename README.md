@@ -1,127 +1,59 @@
-# Argus — WordPress Security Scanner with AI-Powered Analysis
+<div align="center">
+  <img src="./docs/media/argus-banner.webp" alt="Argus — WordPress Security Scanner" width="100%">
+</div>
 
-```
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡅⠀⠀⠀⠀⠀⠀⠀⡄⠀⠠⠀⠀⠀⠀⠀⠀⠀⠀⠀⡌⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡜⣰⠀⠀⠆⠀⠀⢀⠌⡄⡌⠁⠀⠀⠠⠁⠀⠀⠀⢀⠜⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⠚⡔⢣⠀⡰⢀⡀⠴⣡⠚⠠⠀⠀⢀⡐⠃⠀⢀⡄⠎⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⢀⢰⠸⡤⠋⡠⢧⠹⡔⢫⠜⣱⢂⡭⢄⠲⣌⢣⠜⡰⡘⢦⢈⡀⠄⠒⠀⠀⠀⠀⠀⠀⡀⠄⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀⠀⢀⠀⠀⠀⢀⠠⣐⠎⡜⡈⡱⡘⡕⡱⢌⠳⣌⠧⢪⠑⠮⠔⠎⠳⡜⣬⠚⣥⡙⢆⡣⢜⢣⠒⣆⠲⡐⢆⢣⠃⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢑⠦⡠⢄⠤⣀⢖⡰⣊⠬⡓⣌⠦⣈⠲⣡⠃⠜⠂⢉⠠⠀⠄⠂⠄⢂⠐⡀⠂⠄⢀⠉⡐⠪⠱⣌⢣⢎⡹⣐⠣⡝⣠⢀⠀⠀⠠⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠑⢎⠲⡡⢎⠴⣡⠣⣕⠪⠜⠀⡁⠀⠄⠂⠌⡀⠂⠡⢈⠐⠈⡀⠂⠄⠁⢂⠀⠂⠄⠂⡁⠀⡉⠂⠵⣈⠳⣘⠤⣋⢜⡡⢆⣀⣀⢂⡔⠲⠈⠁⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠐⠢⠔⢲⡐⠮⣌⢣⡑⢎⡲⠅⠃⠠⢀⠂⡐⠠⠁⠌⠐⠀⠀⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠈⠐⢀⠂⠄⠁⠐⡈⠄⡈⠑⢬⡑⠪⡆⣙⠆⠶⣈⠒⣈⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠀⣐⠣⡜⢣⠜⣢⠙⠈⡀⠐⡈⠐⡀⠂⠄⠁⠀⠀⠀⠀⠀⠂⠁⠀⠂⠁⠀⠀⠀⠂⠀⠀⠀⠀⠀⠌⠠⢁⠠⠀⠐⠈⡀⠘⢅⠎⡰⢌⠥⠡⠓⢆⣒⠲⠌⠃⠃⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⠠⢀⡀⣀⢀⡀⡥⢰⣉⠦⡙⣌⢣⠚⠀⠠⠁⠄⠡⢀⠡⠐⠀⠀⠀⠀⠀⠀⠈⣀⢠⡔⠤⠀⠀⠀⠈⠀⡀⠀⠁⠀⠄⠀⠀⠀⠂⠠⠁⠌⠀⠀⡀⠀⠉⡖⢢⡙⢤⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠈⠀⢉⡐⡣⢜⢢⡙⡄⠃⠁⠌⠠⠁⡌⢐⠠⠂⠀⠀⠠⠀⠁⠀⡀⠀⠀⠉⠃⠀⠀⡀⢀⠂⠁⠀⠈⠀⠠⠀⠐⠈⠀⠀⠁⡈⠐⡈⠄⠀⢂⠐⠈⢣⠜⣢⢙⠢⢄⡀⠄⠀⠀⠀⣀⠠⠐⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠠⢁⡔⢎⠲⣉⠎⠂⠁⠠⡀⢁⡈⠤⠑⡠⠊⡄⠁⠂⠀⠀⠀⠀⠂⠀⠀⠀⠀⠀⠀⠂⠀⠀⠠⠐⠈⠀⠂⠀⠀⡀⠀⠀⠀⠀⠠⠁⠄⠂⡁⠀⠌⠐⡀⠳⢄⢋⠖⡠⣘⡈⠣⠙⠂⠁⠁⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢁⠠⠊⢠⡘⣌⠳⠀⢠⠈⠄⢁⠐⡄⠢⢌⠱⡠⢃⠄⠀⠀⠀⠈⠀⢀⠀⠀⠀⠀⠂⠀⠀⡀⠀⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠄⠀⠀⡡⢈⠀⠠⠈⠄⠀⠐⡀⠫⢄⢫⠔⣡⠆⡄⠁⠁⠈⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠐⠠⠀⡀⡍⢦⠱⡌⠁⡈⠄⢈⠐⡄⠣⡔⢡⢊⡥⣓⢎⠀⠀⠀⢀⠀⠄⠀⢀⠈⠀⠁⠀⠀⠄⠀⠀⠀⡀⠈⠀⠀⡀⠁⢀⠀⠁⠀⠀⠀⠀⠰⢡⠈⡄⠁⠂⠄⠂⠠⠀⣋⠦⡙⡔⢪⠔⡢⢄⡀⣀⢀⡀
-        ⠀⠀⠀⠀⠀⢀⣀⠁⠤⠒⢭⠒⡍⠆⠃⠠⠀⠐⢀⠢⢁⠨⡑⡩⢆⣏⠲⡍⡞⠀⠀⠀⠀⠀⢀⠠⠀⠀⠌⠀⠀⠀⡀⠀⠠⠀⠀⠀⠄⢁⣀⠀⠀⠀⠂⠀⠁⠀⠀⣳⢢⢅⡘⠤⠈⠐⡈⠄⠁⢀⠎⡱⢜⡡⠊⠑⠒⠘⠐⠀⠀
-        ⠀⠀⠀⠀⠀⢀⠠⠐⡠⢔⢪⠑⡈⠐⠌⠠⠁⠐⠠⡐⠌⡂⡼⣱⢫⡜⣣⠝⡼⡀⠀⠠⠀⠈⠀⠀⠠⠀⠀⠁⠀⠀⠀⠀⠄⠀⠐⠀⡐⠀⠀⠐⠀⠀⠀⠀⠀⡐⠀⡭⣕⠺⣜⢢⠁⡂⠀⠂⠄⡂⢖⠨⡐⠡⠋⠤⡀⠀⠀⠀⠀
-        ⠀⠀⠀⠠⢁⠂⡔⢪⠔⠉⠤⡘⠤⢁⠘⡀⢀⠈⠥⡐⠡⢘⡱⢣⠳⡜⢥⢫⡕⢣⠀⠀⡀⠄⠐⠀⠀⠀⠀⠀⢀⠲⠄⠤⠠⢄⠰⢀⠐⠌⠁⠠⢀⠀⠀⠂⠀⠀⢰⡱⢎⡝⢮⢣⢇⠄⡀⢁⠤⠉⠢⡑⢬⢡⠡⣄⠠⣁⢀⡀⢀
-        ⠀⠀⠌⡐⠀⠎⢌⠡⢌⡘⡡⠜⡰⠡⡐⠰⠀⢂⠑⡈⢅⠨⣕⢫⣓⡹⢎⡣⢞⡱⣂⠐⠀⡀⠀⠀⠀⡀⠀⠁⠆⠀⠌⢘⠀⢃⠂⠎⠀⠄⠀⠀⠀⠀⠀⢀⠀⢀⠶⣙⠮⣜⣣⠯⣜⠠⢀⢃⡌⡲⢍⠭⣰⣃⠳⠌⠳⠄⠆⠜⡠
-        ⠀⠌⠀⠀⠤⣉⠦⣑⠪⡔⣡⢣⡑⢣⠱⣡⢋⡔⡢⢄⡒⠄⢩⠖⣥⢛⡬⢳⣍⢳⢭⣆⡐⠀⠐⠀⠐⠀⠀⠀⡀⠀⠀⠄⠈⠀⠅⡐⠈⠀⠀⠁⠀⠠⠀⠂⣠⢋⡞⣥⢛⡴⢣⡝⠢⣠⢒⠵⣊⡥⢖⡭⢤⣀⡀⠂⠁⠀⠠⠀⠀
-        ⠐⠀⡈⠀⢂⡀⠄⢁⠓⡨⠄⢣⡘⠥⠓⠦⠳⠸⠡⢏⡜⡲⣄⠛⡴⣋⣜⢣⢎⢧⡛⡼⡰⣄⠀⠤⠁⠀⢀⠀⠀⠀⠀⠀⠀⠐⠀⠐⠄⠀⠄⢀⠌⠀⢀⡴⣃⠯⡜⢦⢫⡜⢣⣊⡞⢴⡋⠞⠁⣀⠢⢀⠌⠁⠈⠂⠄⠁⠀⠀⠀
-        ⠈⢀⠀⠐⠀⠀⠍⠂⠘⠀⠐⠂⠘⠤⣁⢂⠡⢆⠳⡐⠎⣑⠪⢛⣦⢕⡮⣙⢎⠮⣕⢣⡽⢢⠳⣄⣀⠀⠀⠠⠁⠈⠀⠀⠀⡄⠐⠀⠐⠡⠈⢂⡤⣊⠷⡸⢥⡛⣜⢧⣳⡝⣯⢷⣙⡫⠖⠞⠤⠆⣅⠂⠀⠠⠁⡀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⠂⠐⠠⠀⠀⡀⠌⠀⠅⠢⢑⠦⣉⠧⢬⡑⠫⡷⣮⣗⣮⢳⣜⢫⡝⢦⣋⢾⡱⢆⡤⣄⣁⣀⣈⡐⢬⠤⣔⡲⢭⢳⡼⣡⢟⡹⣖⡽⣞⢧⣳⢫⠓⠦⡛⠍⡑⠨⠐⡄⠂⡌⠑⠠⠐⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠁⠈⠠⠐⠀⠠⠀⡀⠀⠀⠄⠂⠥⠀⢊⡐⠭⡒⠭⣓⠬⣝⢾⣿⣿⣞⡷⣚⣧⣹⢶⣙⢮⡵⣚⢦⡳⢎⡵⣫⢞⡼⣱⣏⣷⣺⣽⣾⢿⣭⢷⣛⡚⠐⠣⠍⡒⠡⠘⡠⢁⠢⠸⡷⠌⢠⠁⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠠⠥⠀⠀⠈⠀⠀⠀⡁⠂⠔⣂⠈⡑⢎⡳⢣⠟⣰⢒⢦⡝⣿⠾⣿⣿⡿⣿⣿⡿⣿⢿⣿⡿⣿⣿⣿⣿⠿⠿⣛⢯⢣⠳⡜⢆⢦⡹⣙⠒⠦⢤⣁⠤⡰⢀⠣⡑⢠⠈⢂⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠐⠈⠐⠄⡊⠄⠑⠢⢄⢂⠱⣄⢫⢄⠏⡼⣡⢏⠶⣩⡗⣻⢼⣿⣝⡳⣎⢿⣹⡛⣯⡝⣎⢣⢲⡣⢍⠜⢢⠝⢪⡑⢭⠚⣤⢓⡬⣙⣪⡶⣌⠇⠡⢊⠀⡔⡡⢊⠀⢀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⡈⢒⠤⡠⠜⡄⢆⣣⠘⡜⢲⢱⣊⠳⣥⢋⠷⣿⣷⢫⣷⣽⡾⣥⢛⡴⡹⣌⠇⣣⠱⣋⠖⡥⢛⠴⣈⠢⡋⡴⢃⠒⠥⠎⡑⢄⢲⡑⢃⠰⠌⠡⠀⠌⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⠀⠧⡑⠫⣜⣃⣼⣸⡜⣣⠦⣉⠳⡌⡍⢞⡹⣌⠳⣌⢳⡙⠶⡩⢖⡱⢪⡙⡤⢣⡜⢮⡱⢫⡜⡡⠏⠐⢄⠂⡅⢒⠨⠰⡌⣔⢫⠣⡑⠠⠀⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡁⢎⠴⣊⢳⡘⠥⢎⠥⡓⡜⡸⢜⢢⠇⡏⢖⡣⢞⡱⢍⠶⡡⢇⢣⢳⡡⢾⣟⡱⠣⢈⠔⡨⢑⠠⠀⡘⢄⠣⠑⡌⡐⢂⠡⢀⠁⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⡌⢲⠡⢆⡹⡘⢤⢃⡜⠰⣁⠊⠦⠙⡜⢬⠒⡥⢊⢇⠮⣑⢎⢣⠣⡝⡲⠬⣁⠶⣁⠸⠀⠁⠢⡘⠌⢂⠅⠠⡀⠅⢂⠐⠀⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠘⢤⢋⠦⡱⣉⢆⠣⡜⡱⢂⠡⠌⠓⣌⢣⡙⡤⢍⢎⠶⣩⠎⣡⠣⠱⡁⢾⠯⠀⡍⠢⢀⠂⠅⡐⠠⠂⠌⡁⠐⡈⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢂⠇⣎⠱⡌⢎⡱⢜⡡⢋⠦⡙⠦⢌⠲⣡⡙⣬⢚⡻⣷⡛⢤⠃⢃⠱⢀⢂⠒⡈⢁⠂⠌⡐⠠⠁⠌⡐⠠⠁⠀⠀⠀⠀⠀⠐⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⢎⡔⢣⠜⡢⢕⠪⡜⡱⢊⠵⣉⢎⡱⢢⢱⢂⠯⡜⢆⠭⢒⡉⢄⠎⡄⢂⠐⠄⠂⠌⡐⠠⠁⠌⠐⠀⠀⠀⠀⠀⠀⠀⠀⠀⠂⠇⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⢊⠴⡘⡌⢎⡱⢊⡱⢌⡱⣉⠖⡡⢎⡔⢣⠎⠌⠐⠔⡄⠚⢠⠉⡌⠠⠐⠠⠈⠄⡁⢂⠐⠠⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⢆⡱⡘⢦⢡⠣⡜⢢⠱⣌⠪⠱⡌⡜⡡⠎⢐⠂⢢⠐⢁⠀⠆⡐⠠⢁⠂⡁⢂⠐⠠⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢨⢐⢢⢉⣆⢣⠓⣌⢣⠓⣤⢋⣵⢘⣄⡃⢠⢁⠊⡔⢠⡈⠀⡄⡐⢀⠂⡐⢀⠂⡌⢀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                    ╔═══════════════════════════════════════════════════════╗
-                    ║         ARGUS — WP Watch & Evidence Collector         ║
-                    ║                                                       ║
-                    ║    Vulnerability WP Detection | Ethical Testing       ║
-                    ║    Author: Rodney Dhavid Jimenez Chacin (rodhnin)     ║
-                    ║    Website: https://www.rodhnin.com                   ║
-                    ╚═══════════════════════════════════════════════════════╝
-                            "Eyes on the site. Proof in the log..."
-            ╔═════════════════════════════════════════════════════════════════════╗
-            ║       ETHICAL USE ONLY - Use on authorized targets exclusively      ║
-            ║       Consent verification required for aggressive/AI modes         ║
-            ╚═════════════════════════════════════════════════════════════════════╝
-```
+<br>
 
 <div align="center">
 
-![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Docker](https://img.shields.io/badge/docker-ready-blue.svg)
-![LangChain](https://img.shields.io/badge/LangChain-1.0.0-purple.svg)
-![Status](https://img.shields.io/badge/status-active-success.svg)
+[![Version](https://img.shields.io/badge/version-0.2.0-7c3aed?style=for-the-badge&labelColor=0d0d1a)](https://github.com/rodhnin/argus-wp-watcher/releases)
+[![Python](https://img.shields.io/badge/python-3.10+-22d3ee?style=for-the-badge&labelColor=0d0d1a&logo=python&logoColor=22d3ee)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-4ade80?style=for-the-badge&labelColor=0d0d1a)](LICENSE)
+[![Docker](https://img.shields.io/badge/docker-ready-22d3ee?style=for-the-badge&labelColor=0d0d1a&logo=docker&logoColor=22d3ee)](docker/)
+[![LangChain](https://img.shields.io/badge/LangChain-1.0.0-a78bfa?style=for-the-badge&labelColor=0d0d1a)](docs/AI_INTEGRATION.md)
+[![Ethical](https://img.shields.io/badge/ethical-use_only-f87171?style=for-the-badge&labelColor=0d0d1a)](docs/ETHICS.md)
 
-**Ethical WordPress vulnerability scanner with AI-powered analysis and consent-based testing**
+<br>
 
-[🚀 Quick Start](#-quick-start) •
-[📖 Documentation](docs/) •
-[🐳 Docker](#-docker-deployment) •
-[🤖 AI Features](#-ai-powered-analysis) •
-[⭐ Star Us](https://github.com/rodhnin/argus-wp-watcher)
+**Ethical WordPress vulnerability scanner — real-time CVE correlation, OWASP mapping, AI-powered analysis, and consent-based testing.**
 
+<br>
+
+[Quick Start](#-quick-start) &nbsp;·&nbsp;
+[Documentation](docs/) &nbsp;·&nbsp;
+[Docker](#-docker-deployment) &nbsp;·&nbsp;
+[AI Features](#-ai-powered-analysis) &nbsp;·&nbsp;
+[Star on GitHub](https://github.com/rodhnin/argus-wp-watcher)
+
+</div>
+
+<br>
+
+<div align="center">
+  <img src="./docs/media/argus-hero.webp" alt="Argus — Eyes on the site. Proof in the log." width="100%">
 </div>
 
 ---
 
-## 🎬 Demo
-
-### Scanner in Action
+## In Action
 
 <div align="center">
-  <img src="./docs/media/argus.gif" alt="Argus Scanner Demo" width="800">
-
-_Demo showing:_
-
--   CLI execution with real-time progress indicators
--   Vulnerability detection and evidence collection
--   HTML report generation
+  <img src="./docs/media/console.webp" alt="Argus scan — real output against WordPress 6.0.3" width="100%">
+  <br><sub>Live scan · WordPress 6.0.3 · 49 CVEs detected · 18 findings · 47s</sub>
 </div>
 
----
+<br>
 
-## 📸 Screenshots
-
-### Console Execution
-
-<div align="center">
-  <img src="./docs/media/console.png" alt="Console Execution" width="900">
-
-_Real-time scan execution_
-
-</div>
-
-### HTML Report
-
-<div align="center">
-  <img src="./docs/media/report_html.png" alt="HTML Report Preview" width="900">
-
-_Beautiful HTML report with:_
-
--   🎨 Mystical theme with deep purple/dark tones
--   🏷️ Color-coded severity badges (Critical, High, Medium, Low, Info)
--   📝 Expandable evidence sections showing HTTP responses
--   🤖 AI-generated hardening guides (technical + executive modes)
--   📊 WordPress information and vulnerability details
-</div>
-
-### JSON Report
-
-<div align="center">
-  <img src="./docs/media/report_json.png" alt="JSON Report Preview" width="900">
-
-_Machine-readable JSON report for:_
-
--   🤖 Programmatic processing and automation
--   📈 Historical analysis and reporting
--   🔍 Detailed findings with evidence and severity classification
-</div>
+<table width="100%"><tr>
+<td width="50%" align="center">
+  <img src="./docs/media/report-html.webp" alt="Argus HTML report — scan overview" width="100%">
+  <br><sub>Scan overview · severity breakdown</sub>
+</td>
+<td width="50%" align="center">
+  <img src="./docs/media/report-findings.webp" alt="Argus HTML report — security findings" width="100%">
+  <br><sub>Findings · CVE/OWASP badges · filter bar</sub>
+</td>
+</tr></table>
 
 ---
 
@@ -131,23 +63,28 @@ Argus is a production-ready WordPress security scanner that puts **ethics first*
 
 ### Why Argus?
 
--   **🔒 Ethical by Design**: Consent token system prevents unauthorized scanning
--   **🤖 AI-Powered**: GPT-4, Claude, or local Ollama for intelligent remediation guides
--   **📊 Professional Reports**: Beautiful HTML + machine-readable JSON
--   **🚀 Fast & Efficient**: Concurrent scanning with intelligent rate limiting
--   **💾 Persistent Tracking**: SQLite database for scan history and trend analysis
--   **🐳 Docker Ready**: Containerized scanning + vulnerable test lab included
+- **🔒 Ethical by Design**: Consent token system prevents unauthorized scanning
+- **🔍 Real CVE Data**: Live correlation with WPVulnerability.net + CVSS scores from NVD (both free, no key)
+- **🗂️ OWASP Mapping**: Every finding mapped to OWASP Top 10 2021
+- **📈 Scan Diffing**: `--diff last` compares scans to track remediation progress
+- **🤖 AI-Powered**: GPT-4, Claude, or local Ollama — with streaming, agent mode, and multi-LLM compare
+- **📊 Professional Reports**: Rich HTML with CVE/CWE/OWASP/CVSS badges + machine-readable JSON
+- **🚀 Fast & Efficient**: Concurrent scanning with intelligent rate limiting
+- **💾 Persistent Tracking**: SQLite database for scan history
+- **🐳 Docker Ready**: Containerized scanning + vulnerable test lab included
 
 ### What It Scans
 
-| Check Category          | Details                                                       |
-| ----------------------- | ------------------------------------------------------------- |
-| **WordPress Detection** | Version fingerprinting via meta tags, readme, RSS, assets     |
-| **Plugins & Themes**    | Enumeration of 100+ popular plugins/themes with version hints |
-| **Sensitive Files**     | 70+ paths including wp-config backups, .env, SQL dumps, .git  |
-| **User Enumeration**    | Safe techniques: Author IDOR, REST API, HTML parsing          |
-| **Security Headers**    | HSTS, CSP, X-Frame-Options, cookie security                   |
-| **Misconfigurations**   | XML-RPC, debug mode, directory listing, file editor           |
+| Check Category          | Safe Mode   | Aggressive  | Details                                                                  |
+| ----------------------- | ----------- | ----------- | ------------------------------------------------------------------------ |
+| **WordPress Detection** | ✅          | ✅          | Version fingerprinting via meta tags, readme, RSS, assets                |
+| **Plugins & Themes**    | 100 plugins | 447 plugins | Version detection (4 methods) + real-time CVE/CVSS correlation           |
+| **Sensitive Files**     | 74 paths    | 437 paths   | wp-config backups, .env, SQL dumps, .git, debug logs, PHP tools          |
+| **User Enumeration**    | 3 methods   | 6 methods   | Author IDOR, REST API, HTML parsing + oEmbed, login error, XML-RPC       |
+| **Security Headers**    | ✅          | ✅          | HSTS, CSP, X-Frame-Options, Referrer-Policy, Permissions-Policy          |
+| **Misconfigurations**   | ✅          | ✅          | XML-RPC, debug mode, directory listing, file editor                      |
+| **Login Security**      | ❌          | ✅          | 2FA, CAPTCHA, brute-force protection, open registration, password policy |
+| **Web Crawl**           | ❌          | ✅          | robots.txt, sitemap.xml, HTML comments, link discovery (depth 1)         |
 
 ---
 
@@ -160,25 +97,53 @@ Argus is a production-ready WordPress security scanner that puts **ethics first*
 python -m argus --target https://example.com --html
 ```
 
--   **Multi-Method Fingerprinting**: Detects WordPress 4.x-6.x with zero false positives
--   **Concurrent Scanning**: Thread pool + rate limiting for fast, respectful scans
--   **Smart Detection**: Early abort for non-WordPress sites (99% faster rejection)
--   **Evidence Collection**: HTTP responses, headers, and file contents preserved
+- **Multi-Method Fingerprinting**: Detects WordPress 4.x-6.x with zero false positives
+- **Real-Time CVE Correlation**: Checks every detected plugin, theme, and core version against WPVulnerability.net (free, no API key)
+- **CVSS Scoring**: Fetches scores from NVD for each CVE (critical ≥9.0, high ≥7.0, medium ≥4.0)
+- **Latest Version Detection**: WordPress.org API shows the current stable version alongside detected version
+- **OWASP Top 10 2021**: Every finding mapped to its OWASP category (A01–A10)
+- **Concurrent Scanning**: Thread pool + rate limiting for fast, respectful scans
+- **Smart Detection**: Early abort for non-WordPress sites (99% faster rejection)
+- **Evidence Collection**: HTTP responses, headers, and file contents preserved
+
+### 📈 Scan Diff Reports (v0.2.0)
+
+Track remediation progress between scans:
+
+```bash
+# Compare this scan against the previous one
+python -m argus --target https://example.com --html --diff last
+
+# Or reference a specific scan ID
+python -m argus --target https://example.com --html --diff 42
+```
+
+The diff section shows:
+
+- **New** findings (appeared since last scan) — in red
+- **Fixed** findings (remediated since last scan) — in green with strikethrough
+- **Persisting** findings (present in both scans) — collapsed by default
+- **Mode mismatch warning** when comparing safe vs aggressive scans
 
 ### 🤖 AI-Powered Analysis
 
 Choose your AI provider based on your needs:
 
-| Provider             | Best For           | Speed           | Cost          | Privacy         |
-| -------------------- | ------------------ | --------------- | ------------- | --------------- |
-| **OpenAI GPT-4**     | Production quality | ⚡ Fast (35s)   | 💰 $0.25/scan | 🔒 Standard     |
-| **Anthropic Claude** | Privacy-focused    | ⚡ Fast (45s)   | 💰 $0.30/scan | 🔒 Enhanced     |
-| **Ollama (Local)**   | Complete privacy   | 🐢 Slow (28min) | 💰 Free       | 🔐 100% Offline |
+| Provider                         | Best For           | Speed     | Cost/scan  | Privacy         |
+| -------------------------------- | ------------------ | --------- | ---------- | --------------- |
+| **OpenAI gpt-4o-mini** (default) | Best value         | ⚡ ~40s   | 💰 ~$0.006 | 🔒 Standard     |
+| **OpenAI gpt-4o**                | Production quality | ⚡ ~40s   | 💰 ~$0.05  | 🔒 Standard     |
+| **Anthropic claude-3-5-haiku**   | Privacy-focused    | ⚡ ~55s   | 💰 ~$0.02  | 🔒 Enhanced     |
+| **Ollama (Local)**               | Complete privacy   | 🐢 ~28min | 💰 Free    | 🔐 100% Offline |
 
-**Two Analysis Modes:**
+**Analysis Modes:**
 
--   **Technical**: Step-by-step remediation with commands and configuration snippets
--   **Executive**: Plain-language summaries for stakeholders and management
+- **Technical**: Step-by-step remediation with WP-CLI commands and configuration snippets
+- **Executive**: Plain-language summaries for stakeholders and management
+- **Agent** (`--ai-agent`): Enriched with live NVD CVE data and WPVulnerability.net lookups (free APIs)
+- **Compare** (`--ai-compare`): Side-by-side analysis from multiple providers in parallel
+- **Stream** (`--ai-stream`): Real-time token output as the AI generates
+- **Budget** (`--ai-budget`): Cost cap enforcement with configurable abort threshold
 
 ### 📊 Professional Reporting
 
@@ -187,26 +152,39 @@ Choose your AI provider based on your needs:
 ```json
 {
   "tool": "argus",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "target": "https://example.com",
-  "summary": {
-    "critical": 9,
-    "high": 6,
-    "medium": 14,
-    "low": 4,
-    "info": 66
-  },
-  "findings": [...]
+  "summary": {"critical": 3, "high": 5, "medium": 8, "low": 6, "info": 5},
+  "findings": [
+    {
+      "id": "ARGUS-WP-012",
+      "title": "Vulnerable plugin: elementor v3.5.0 (31 CVEs)",
+      "severity": "critical",
+      "owasp": {"id": "A06", "name": "Vulnerable and Outdated Components"},
+      "latest_version": "3.28.1",
+      "cve": ["CVE-2022-1329", "CVE-2022-29455"],
+      "vulnerabilities": [
+        {"title": "Elementor < 3.4.8 — Authenticated RCE", "cvss": 8.8, "cve_id": "CVE-2022-1329"}
+      ]
+    }
+  ],
+  "diff": {"ref_scan_id": 41, "new": [...], "fixed": [...], "persisting": [...]}
 }
 ```
 
-**HTML Reports** (Human-Friendly)
+**HTML Reports** (Human-Friendly, v0.2.0)
 
--   🎨 Responsive design with inline CSS
--   🏷️ Color-coded severity badges
--   📝 Expandable evidence sections
--   🤖 AI analysis beautifully formatted
--   📱 Mobile-friendly
+- 🎨 Responsive design with inline CSS (no external dependencies)
+- 🏷️ Color-coded severity badges + interactive filter bar
+- 🔴 CVE badges linking to NVD, purple CWE badges (deduplicated)
+- 🟣 OWASP Top 10 2021 badge per finding
+- 🟢 Latest stable version badge for vulnerable components
+- 📊 Color-coded CVSS score badge per CVE (red/orange/yellow/green)
+- 📝 Expandable CVE detail panels, expandable recommendations
+- 🔧 Security header config snippets (Apache / Nginx / WordPress)
+- 📈 Diff section (new/fixed/persisting) with mode mismatch warning
+- 🤖 AI analysis with tabs (executive / technical / agent)
+- 📱 Mobile-friendly
 
 ### 🔐 Consent Token System
 
@@ -230,10 +208,11 @@ python -m argus --target https://example.com --aggressive --use-ai
 
 SQLite database tracks everything:
 
--   **Scan History**: Date, duration, findings count, severity breakdown
--   **Finding Repository**: Searchable vulnerability database
--   **Verified Domains**: Consent token tracking with expiration
--   **Trend Analysis**: Compare scans over time
+- **Scan History**: Date, duration, findings count, severity breakdown
+- **Finding Repository**: Searchable vulnerability database with `finding_code` index
+- **Verified Domains**: Consent token tracking with expiration
+- **AI Cost Records**: Per-analysis cost tracking with `ai_costs` table (v0.2.0+)
+- **Diff Foundation**: Findings persisted per scan enable `--diff` comparisons
 
 ```bash
 # Query recent scans
@@ -249,9 +228,9 @@ sqlite3 ~/.argos/argos.db "SELECT * FROM v_critical_findings"
 
 ### Prerequisites
 
--   **Python 3.11+** (3.12 recommended)
--   **pip** (Python package manager)
--   **Docker** (optional, for containerized scanning)
+- **Python 3.11+** (3.12 recommended)
+- **pip** (Python package manager)
+- **Docker** (optional, for containerized scanning)
 
 ### Installation
 
@@ -309,7 +288,7 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 
 ```bash
 python -m argus --version
-# Output: Argus v0.1.0
+# Output: Argus v0.2.0
 ```
 
 ### Your First Scan
@@ -362,45 +341,47 @@ python -m argus --target https://example.com --report-dir ./my-reports
 
 ### AI-Powered Analysis
 
-**Step 1: Configure your provider**
+**Step 1: Set your API key**
 
-Edit `config/defaults.yaml`:
-
-```yaml
-ai:
-    langchain:
-        provider: "openai" # Options: openai, anthropic, ollama
-        model: "gpt-4-turbo-preview"
-        temperature: 0.3
+```bash
+export OPENAI_API_KEY="sk-..."
 ```
 
 **Step 2: Test your setup**
 
 ```bash
-# Verify AI provider works
+# Verify AI works with default model (gpt-4o-mini-2024-07-18)
 python -m argus.core.ai openai
 ```
 
 **Step 3: Run AI-powered scan**
 
 ```bash
-# Technical analysis (for security teams)
-python -m argus --target https://example.com \
-  --use-ai \
-  --ai-tone technical \
-  --html
+# Both analyses in one scan (~$0.006 with default model)
+python -m argus --target https://example.com --use-ai --html
 
-# Executive summary (for management)
-python -m argus --target https://example.com \
-  --use-ai \
-  --ai-tone non_technical \
-  --html
+# Technical only (for security teams)
+python -m argus --target https://example.com --use-ai --ai-tone technical --html
 
-# Both analyses in one report
+# Executive only (for management)
+python -m argus --target https://example.com --use-ai --ai-tone non_technical --html
+
+# Override model or provider at runtime
+python -m argus --target https://example.com --use-ai --ai-model gpt-4o --html
+python -m argus --target https://example.com --use-ai --ai-provider anthropic --html
+
+# Stream output in real time
+python -m argus --target https://example.com --use-ai --ai-stream
+
+# Agent mode with NVD CVE lookup (free)
+python -m argus --target https://example.com --use-ai --ai-agent --html
+
+# Compare two providers side by side
 python -m argus --target https://example.com \
-  --use-ai \
-  --ai-tone both \
-  --html
+  --use-ai --ai-compare openai,anthropic --html
+
+# Budget cap ($0.05 max)
+python -m argus --target https://example.com --use-ai --ai-budget 0.05
 ```
 
 ### Aggressive Mode (Requires Consent)
@@ -435,10 +416,10 @@ Argus uses **LangChain 1.0.0** with support for multiple AI providers, giving yo
 
 **Best for: Production use**
 
--   ⭐ Quality: Excellent (5/5)
--   ⚡ Speed: ~35 seconds
--   💰 Cost: ~$0.25 per scan
--   🔒 Privacy: Standard (data encrypted in transit)
+- ⭐ Quality: Excellent (5/5)
+- ⚡ Speed: ~35 seconds
+- 💰 Cost: ~$0.25 per scan
+- 🔒 Privacy: Standard (data encrypted in transit)
 
 ```bash
 export OPENAI_API_KEY="sk-..."
@@ -449,10 +430,10 @@ python -m pip install langchain-openai==1.0.0
 
 **Best for: Enhanced privacy**
 
--   ⭐ Quality: Excellent (5/5)
--   ⚡ Speed: ~45 seconds
--   💰 Cost: ~$0.30 per scan
--   🔒 Privacy: Enhanced (Anthropic's privacy-first approach)
+- ⭐ Quality: Excellent (5/5)
+- ⚡ Speed: ~45 seconds
+- 💰 Cost: ~$0.30 per scan
+- 🔒 Privacy: Enhanced (Anthropic's privacy-first approach)
 
 ```bash
 export ANTHROPIC_API_KEY="sk-ant-..."
@@ -463,10 +444,10 @@ python -m pip install langchain-anthropic==1.0.0
 
 **Best for: Complete privacy**
 
--   ⭐ Quality: Good (3/5)
--   🐢 Speed: ~28 minutes (CPU) or ~75 seconds (GPU)
--   💰 Cost: Free
--   🔐 Privacy: 100% offline (data never leaves your machine)
+- ⭐ Quality: Good (3/5)
+- 🐢 Speed: ~28 minutes (CPU) or ~75 seconds (GPU)
+- 💰 Cost: Free
+- 🔐 Privacy: 100% offline (data never leaves your machine)
 
 ```bash
 # Install Ollama: https://ollama.ai
@@ -479,24 +460,34 @@ python -m pip install "langchain-ollama>=0.3.0,<0.4.0"
 **Automatic Sanitization**
 Before sending data to AI providers, Argus automatically removes:
 
--   ✅ Consent tokens
--   ✅ API keys and credentials
--   ✅ Personal Identifiable Information (PII)
--   ✅ Internal IP addresses
--   ✅ Database credentials
+- ✅ Consent tokens
+- ✅ API keys and credentials
+- ✅ Personal Identifiable Information (PII)
+- ✅ Internal IP addresses
+- ✅ Database credentials
 
 **Opt-In Only**
 
--   AI analysis requires explicit `--use-ai` flag
--   Aggressive scanning requires verified consent token
--   You control which provider sees your data
+- AI analysis requires explicit `--use-ai` flag
+- Aggressive scanning requires verified consent token
+- You control which provider sees your data
 
 **For Maximum Privacy**
 Use Ollama locally. While slower and less accurate, your scan data never leaves your machine.
 
 ### Switching Providers
 
-**Current Method (v0.1.0):** Edit `config/defaults.yaml`
+**Option A — CLI flags (runtime override, no file editing)**
+
+```bash
+# Switch to Anthropic for this scan only
+python -m argus --target https://example.com --use-ai --ai-provider anthropic --ai-model claude-3-5-haiku-20241022
+
+# Switch to local Ollama
+python -m argus --target https://example.com --use-ai --ai-provider ollama --ai-model llama3.2
+```
+
+**Option B — `config/defaults.yaml` (change the persistent default)**
 
 ```yaml
 ai:
@@ -594,10 +585,10 @@ Argus implements **technical controls** to prevent misuse:
 
 Unauthorized access to computer systems is **illegal** in most jurisdictions:
 
--   🇺🇸 **USA**: Computer Fraud and Abuse Act (CFAA)
--   🇬🇧 **UK**: Computer Misuse Act 1990
--   🇪🇺 **EU**: Directive 2013/40/EU
--   🌍 **International**: Various cybercrime laws
+- 🇺🇸 **USA**: Computer Fraud and Abuse Act (CFAA)
+- 🇬🇧 **UK**: Computer Misuse Act 1990
+- 🇪🇺 **EU**: Directive 2013/40/EU
+- 🌍 **International**: Various cybercrime laws
 
 ### Best Practices
 
@@ -632,11 +623,11 @@ cd docker
 
 **Menu options:**
 
--   `1` → Production scanner only
--   `2` → Testing lab (WordPress + MariaDB) only
--   `3` → Both environments
--   `4` → Stop all services
--   `5` → Remove all containers and data (reset)
+- `1` → Production scanner only
+- `2` → Testing lab (WordPress + MariaDB) only
+- `3` → Both environments
+- `4` → Stop all services
+- `5` → Remove all containers and data (reset)
 
 ---
 
@@ -697,14 +688,14 @@ docker compose -f compose.testing.yml up -d
 
 **What gets deployed:**
 
--   ✅ MariaDB database (for WordPress)
--   ✅ WordPress 6.0 (intentionally vulnerable)
--   ❌ Argus scanner (NOT included in this mode)
+- ✅ MariaDB database (for WordPress)
+- ✅ WordPress 6.0 (intentionally vulnerable)
+- ❌ Argus scanner (NOT included in this mode)
 
 **Access:**
 
--   WordPress: http://localhost:8080 (bound to 127.0.0.1 only)
--   Initial setup takes ~60-90 seconds
+- WordPress: http://localhost:8080 (bound to 127.0.0.1 only)
+- Initial setup takes ~60-90 seconds
 
 **Scan the test environment:**
 
@@ -736,10 +727,10 @@ cd docker
 
 **What gets deployed:**
 
--   ✅ Production Argus scanner
--   ✅ MariaDB database
--   ✅ WordPress 6.0 (vulnerable)
--   ✅ Connection between production scanner and testing network
+- ✅ Production Argus scanner
+- ✅ MariaDB database
+- ✅ WordPress 6.0 (vulnerable)
+- ✅ Connection between production scanner and testing network
 
 **Scan external sites from production scanner:**
 
@@ -782,9 +773,9 @@ cd docker
 ```json
 {
     "tool": "argus",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "target": "https://example-wp-site.com",
-    "date": "2025-10-11T18:45:30Z",
+    "date": "2026-04-15T18:45:30Z",
     "mode": "safe",
     "summary": {
         "critical": 1,
@@ -795,139 +786,95 @@ cd docker
     },
     "findings": [
         {
+            "id": "ARGUS-WP-012",
+            "title": "Vulnerable plugin: contact-form-7 v5.3.1 (6 CVEs)",
+            "severity": "critical",
+            "confidence": "high",
+            "owasp": { "id": "A06", "name": "Vulnerable and Outdated Components" },
+            "latest_version": "5.9.8",
+            "cve": ["CVE-2021-39346", "CVE-2020-35489"],
+            "vulnerabilities": [
+                {
+                    "title": "Contact Form 7 < 5.3.2 — Unrestricted File Upload",
+                    "cvss": 9.8,
+                    "cve_id": "CVE-2020-35489",
+                    "cwe": ["CWE-434"]
+                }
+            ],
+            "description": "Plugin 'contact-form-7' v5.3.1 has 6 known CVEs. Highest CVSS: 9.8 (Critical).",
+            "evidence": {
+                "type": "path",
+                "value": "https://example-wp-site.com/wp-content/plugins/contact-form-7/readme.txt",
+                "context": "Version detected via readme.txt"
+            },
+            "recommendation": "Update contact-form-7 to 5.9.8 (latest stable). Immediate action required.",
+            "affected_component": "contact-form-7 5.3.1"
+        },
+        {
             "id": "ARGUS-WP-030",
             "title": "wp-config.php backup exposed",
             "severity": "critical",
             "confidence": "high",
-            "description": "WordPress configuration file 'wp-config.php.bak' is publicly accessible. This file contains database credentials, security keys, and other sensitive information.",
+            "owasp": { "id": "A05", "name": "Security Misconfiguration" },
+            "description": "WordPress configuration file backup is publicly accessible.",
             "evidence": {
                 "type": "url",
                 "value": "https://example-wp-site.com/wp-config.php.bak",
                 "context": "HTTP 200, Size: 2847 bytes"
             },
-            "recommendation": "CRITICAL - Immediate action required:\n1. Remove this file immediately\n2. Change all database credentials\n3. Regenerate WordPress security keys: https://api.wordpress.org/secret-key/1.1/salt/\n4. Review access logs for potential compromise\n5. Add deny rules to prevent future exposure",
-            "references": [
-                "https://wordpress.org/documentation/article/hardening-wordpress/",
-                "https://developer.wordpress.org/advanced-administration/security/hardening/"
-            ],
+            "recommendation": "Remove immediately and rotate all credentials.",
             "affected_component": "wp-config.php.bak"
         },
         {
-            "id": "ARGUS-WP-001",
-            "title": "WordPress core version disclosed",
-            "severity": "medium",
-            "confidence": "high",
-            "description": "WordPress version 5.8 detected. Version disclosure helps attackers identify known vulnerabilities for targeted exploits.",
-            "evidence": {
-                "type": "other",
-                "value": "Version: 5.8",
-                "context": "Methods: ['readme.html', 'meta_generator']"
-            },
-            "recommendation": "1. Update WordPress to latest version\n2. Hide version info by removing generator tags\n3. Restrict access to readme.html and license.txt\n4. Use security plugins to mask WP fingerprints",
-            "references": [
-                "https://wordpress.org/documentation/article/hardening-wordpress/",
-                "https://developer.wordpress.org/apis/security/"
-            ],
-            "affected_component": "WordPress Core 5.8"
-        },
-        {
-            "id": "ARGUS-WP-040",
-            "title": "User enumerated: admin",
-            "severity": "high",
-            "confidence": "high",
-            "description": "Username 'admin' discovered via author_idor. User enumeration allows attackers to target brute force attacks.",
-            "evidence": {
-                "type": "url",
-                "value": "https://example-wp-site.com/author/admin/",
-                "context": "Method: author_idor, ID: 1"
-            },
-            "recommendation": "1. URGENT: Change username (admin/administrator are prime targets)\n2. Disable author IDOR enumeration (security plugin)\n3. Restrict REST API user endpoint\n4. Implement brute force protection\n5. Enable 2FA for all users\n6. Use security plugins like Wordfence or iThemes Security",
-            "references": [
-                "https://wordpress.org/documentation/article/hardening-wordpress/",
-                "https://owasp.org/www-community/attacks/Brute_force_attack"
-            ],
-            "affected_component": "User: admin"
-        },
-        {
-            "id": "ARGUS-WP-060",
-            "title": "XML-RPC interface enabled",
-            "severity": "medium",
-            "confidence": "high",
-            "description": "WordPress XML-RPC interface is enabled and responding with multiple methods. XML-RPC can be abused for brute force attacks, DDoS amplification, and pingback exploits.",
-            "evidence": {
-                "type": "url",
-                "value": "https://example-wp-site.com/xmlrpc.php",
-                "context": "HTTP 200, methods available"
-            },
-            "recommendation": "Disable XML-RPC if not needed:\n1. Add to .htaccess:\n   <Files xmlrpc.php>\n     Order Deny,Allow\n     Deny from all\n   </Files>\n2. Or use a security plugin to disable\n3. Or add to wp-config.php: add_filter(\"xmlrpc_enabled\", \"__return_false\");\n4. If needed for Jetpack, restrict to Jetpack IPs only",
-            "references": [
-                "https://wordpress.org/support/article/xml-rpc-pingback-api/",
-                "https://kinsta.com/blog/xmlrpc-php/"
-            ],
-            "affected_component": "xmlrpc.php"
-        },
-        {
-            "id": "ARGUS-WP-061",
-            "title": "Directory listing enabled: /wp-content/uploads/",
-            "severity": "medium",
-            "confidence": "high",
-            "description": "Directory listing is enabled for /wp-content/uploads/, exposing items that can be browsed and downloaded.",
-            "evidence": {
-                "type": "url",
-                "value": "https://example-wp-site.com/wp-content/uploads/",
-                "context": "HTTP 200, items listed"
-            },
-            "recommendation": "Disable directory listing for /wp-content/uploads/:\n1. Add to .htaccess: Options -Indexes\n2. Or add blank index.html to each directory\n3. Or configure in Apache/Nginx:\n   Apache: <Directory> Options -Indexes </Directory>\n   Nginx: autoindex off;",
-            "references": ["https://www.acunetix.com/vulnerabilities/web/directory-listing/"],
-            "affected_component": "/wp-content/uploads/"
-        },
-        {
-            "id": "ARGUS-WP-010",
-            "title": "Plugin detected: contact-form-7",
-            "severity": "info",
-            "confidence": "high",
-            "description": "WordPress plugin 'contact-form-7' is installed.",
-            "evidence": {
-                "type": "path",
-                "value": "https://example-wp-site.com/wp-content/plugins/contact-form-7/",
-                "context": "Version: 5.5.3"
-            },
-            "recommendation": "1. Verify contact-form-7 is necessary\n2. Update to latest version\n3. Remove if unused\n4. Check for known CVEs: https://wpscan.com/plugins/",
-            "affected_component": "contact-form-7 5.5.3"
-        },
-        {
             "id": "ARGUS-WP-050",
-            "title": "Missing security header: HSTS (HTTP Strict Transport Security)",
+            "title": "Missing security header: HSTS",
             "severity": "medium",
             "confidence": "high",
-            "description": "HSTS header is not set. It enforces HTTPS and helps prevent protocol downgrade attacks.",
+            "owasp": { "id": "A02", "name": "Cryptographic Failures" },
+            "description": "HSTS header is not set.",
             "evidence": {
                 "type": "header",
                 "value": "Strict-Transport-Security: [not set]",
                 "context": "Header missing in HTTP response"
             },
-            "recommendation": "Add header: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload",
-            "references": ["https://owasp.org/www-project-secure-headers/", "https://securityheaders.com/"]
+            "recommendation": "Add: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload"
         }
     ],
+    "diff": {
+        "ref_scan_id": 41,
+        "ref_date": "2026-04-10T10:00:00Z",
+        "ref_mode": "safe",
+        "current_mode": "safe",
+        "mode_mismatch": false,
+        "new": [{ "id": "ARGUS-WP-012", "title": "Vulnerable plugin: contact-form-7...", "severity": "critical" }],
+        "fixed": [],
+        "persisting": [{ "id": "ARGUS-WP-050", "title": "Missing security header: HSTS", "severity": "medium" }]
+    },
     "notes": {
-        "scan_duration_seconds": 45.32,
-        "requests_sent": 127,
+        "scan_duration_seconds": 26.4,
+        "requests_sent": 312,
         "rate_limit_applied": true,
-        "scope_limitations": "Scan limited to publicly accessible pages. No authenticated testing performed.",
-        "false_positive_disclaimer": "Manual verification recommended for all findings before remediation."
+        "scope_limitations": "Scan limited to publicly accessible pages.",
+        "false_positive_disclaimer": "Manual verification recommended before remediation."
     }
 }
 ```
 
-### HTML Report Features
+> For the complete schema reference see [docs/REPORT_FORMAT.md](docs/REPORT_FORMAT.md) and [`schema/report.schema.json`](schema/report.schema.json).
 
--   **📊 Executive Dashboard**: Summary cards with severity counts
--   **🤖 AI Analysis**: Expandable sections for executive and technical insights
--   **🔍 Detailed Findings**: Organized by severity with evidence
--   **📋 Remediation Steps**: Copy-paste configuration snippets
--   **🔗 External References**: Links to CVE, OWASP, WordPress documentation
--   **📱 Mobile Responsive**: Works on all devices
+### HTML Report Features (v0.2.0)
+
+- **📊 Executive Dashboard**: Summary cards with severity counts + interactive filter bar
+- **🟣 OWASP Top 10 2021 badge** per finding (links to owasp.org)
+- **🔴 CVE badges** linking to NVD, with expandable detail panels
+- **🟠 CVSS score badges** color-coded per CVE (Critical ≥9.0, High ≥7.0, Medium ≥4.0)
+- **🟤 CWE badges** (deduplicated) per finding
+- **🟢 Latest stable version badge** for outdated components
+- **📈 Diff section**: new / fixed / persisting finding tables with mode mismatch warning
+- **🤖 AI Analysis**: tabs for executive, technical, and agent analysis
+- **🔧 Config snippets**: Apache / Nginx / WordPress hardening code blocks
+- **📝 Expandable recommendations** and evidence sections
+- **📱 Mobile-friendly** with inline CSS (no external dependencies)
 
 ---
 
@@ -938,21 +885,26 @@ argus-wp-watcher/
 │
 ├── argus/                      # Main application package
 │   ├── checks/                 # Security check modules
-│   │   ├── config.py           # Configuration auditing
-│   │   ├── files.py            # Sensitive file detection
-│   │   ├── fingerprint.py      # WordPress detection
+│   │   ├── config.py           # Configuration auditing (XML-RPC, debug, editor)
+│   │   ├── crawl.py            # Web crawl checks (robots, sitemap, comments) [v0.2.0]
+│   │   ├── files.py            # Sensitive file detection (74 safe / 437 aggressive paths)
+│   │   ├── fingerprint.py      # WordPress detection + CVE check for core
 │   │   ├── headers.py          # Security headers analysis
-│   │   ├── plugins.py          # Plugin enumeration
+│   │   ├── login.py            # Login security checks (2FA, CAPTCHA, brute-force) [v0.2.0]
+│   │   ├── plugins.py          # Plugin/theme enumeration + CVE correlation [v0.2.0]
 │   │   └── users.py            # User enumeration
 │   │
 │   ├── core/                   # Core infrastructure
-│   │   ├── ai.py               # AI integration (LangChain)
+│   │   ├── ai.py               # AI integration (LangChain, streaming, agent, compare)
 │   │   ├── config.py           # Configuration management
 │   │   ├── consent.py          # Consent token system
 │   │   ├── db.py               # SQLite database interface
+│   │   ├── diff.py             # Scan diff computation (new/fixed/persisting) [v0.2.0]
 │   │   ├── http_client.py      # Rate-limited HTTP client
 │   │   ├── logging.py          # Structured logging
-│   │   └── report.py           # Report generation
+│   │   ├── owasp.py            # OWASP Top 10 2021 mapping for all finding IDs [v0.2.0]
+│   │   ├── report.py           # Report generation (JSON + HTML)
+│   │   └── vuln_db.py          # CVE lookup (WPVulnerability.net + NVD) [v0.2.0]
 │   │
 │   ├── __main__.py             # Entry point
 │   ├── cli.py                  # CLI argument parser
@@ -967,8 +919,14 @@ argus-wp-watcher/
 ├── db/
 │   └── migrate.sql             # Database schema
 │
+├── assets/
+│   └── ascii.txt               # ASCII art branding
+│
 ├── docker/                     # Docker deployment
-│   ├── compose.yml             # Vulnerable WordPress lab
+│   ├── compose.yml             # Production scanner compose
+│   ├── compose.testing.yml     # Vulnerable WordPress lab
+│   ├── deploy.sh               # Interactive deployment script
+│   ├── setup-lab.sh            # Automated vulnerable lab setup [v0.2.0]
 │   └── Dockerfile              # Production image
 │
 ├── docs/                       # Documentation
@@ -1004,61 +962,56 @@ argus-wp-watcher/
 
 **Status:** 🎉 **Released**
 
--   ✅ Complete WordPress security scanner (130+ checks)
--   ✅ AI-powered analysis (OpenAI, Anthropic, Ollama)
--   ✅ Consent token system (HTTP + DNS verification)
--   ✅ Professional reporting (JSON + HTML)
--   ✅ SQLite persistence and scan history
--   ✅ Docker support with vulnerable lab
--   ✅ Comprehensive error handling and resilience
+- ✅ Complete WordPress security scanner (130+ checks)
+- ✅ AI-powered analysis (OpenAI, Anthropic, Ollama)
+- ✅ Consent token system (HTTP + DNS verification)
+- ✅ Professional reporting (JSON + HTML)
+- ✅ SQLite persistence and scan history
+- ✅ Docker support with vulnerable lab
+- ✅ Comprehensive error handling and resilience
 
-### v0.2.0 — Enhanced Detection (Q2 2026)
+### v0.2.0 — Enhanced Detection & AI ✅ (May 2026)
 
-**Focus:** Detection accuracy, AI features, reporting improvements
+**Status:** 🎉 **Released**
 
--   🔜 **Plugin Version Detection**: Extract versions from readme.txt, changelog, assets
--   🔜 **WPScan Integration**: CVE correlation with vulnerability database
--   🔜 **Enhanced HTML Reports**: CVE badges, configuration snippets, better UX
--   🔜 **AI Cost Tracking**: Budget limits, token usage monitoring
--   🔜 **AI Streaming**: Real-time progress for long analyses
--   🔜 **Aggressive Mode Enhancement**: 500 plugins, 50 users, 400+ file paths
--   🔜 **PDF Export**: Customizable PDF reports with branding
-
-**Planned improvements:**
-
--   IMPROV-002: HTML report enrichment
--   IMPROV-003: Plugin version detection
--   IMPROV-004: Aggressive mode differentiation
--   IMPROV-005: AI cost tracking
--   IMPROV-006: AI streaming responses
--   IMPROV-007: Multi-LLM comparison
--   IMPROV-008: AI agent with external tools
+- ✅ **Plugin Version Detection**: 4-method cascade (HTML ?ver=, readme.txt, changelog, PHP header)
+- ✅ **Real-Time CVE Correlation**: WPVulnerability.net (free, no key) for plugins, themes, WP core
+- ✅ **CVSS Scoring**: NVD API — color-coded critical/high/medium/low badges per CVE
+- ✅ **Latest Version**: WordPress.org API shows current stable version alongside detected version
+- ✅ **OWASP Top 10 2021 Mapping**: Every finding mapped to A01–A10 with badge in HTML report
+- ✅ **Enhanced HTML Reports**: CVE/CWE/OWASP/CVSS badges, filter bar, config snippets, expandable panels
+- ✅ **Scan Diff Reports**: `--diff last` / `--diff ID` with new/fixed/persisting, mode mismatch warning
+- ✅ **Aggressive Mode**: 447 plugins, 437 paths, login security (2FA/CAPTCHA/brute-force), web crawl
+- ✅ **AI Cost Tracking**: Budget enforcement, `~/.argos/costs.json`, DB cost records (`ai_costs` table)
+- ✅ **AI Streaming**: `--ai-stream` for real-time token output
+- ✅ **Multi-LLM Compare**: `--ai-compare openai,anthropic` — parallel side-by-side analysis
+- ✅ **AI Agent**: `--ai-agent` with live NVD + WPVulnerability.net tool calls
 
 ### v0.3.0 — Enterprise Features (Q3 2026)
 
 **Focus:** Usability, scale, interactive AI
 
--   🔜 **Interactive Config Management**: Metasploit-style interface (`--show-options`, `--set`)
--   🔜 **Database CLI**: No SQL required (`argus db scans list`, `argus db findings search`)
--   🔜 **Multi-Site Scanning**: Batch processing from file
--   🔜 **AI Chat Interface**: Conversational vulnerability analysis
--   🔜 **CI/CD Integration**: GitHub Actions, Jenkins, GitLab templates
--   🔜 **REST API Server**: FastAPI-based API for automation
+- 🔜 **Interactive Config Management**: Metasploit-style interface (`--show-options`, `--set`)
+- 🔜 **Database CLI**: No SQL required (`argus db scans list`, `argus db findings search`)
+- 🔜 **Multi-Site Scanning**: Batch processing from file
+- 🔜 **AI Chat Interface**: Conversational vulnerability analysis
+- 🔜 **CI/CD Integration**: GitHub Actions, Jenkins, GitLab templates
+- 🔜 **REST API Server**: FastAPI-based API for automation
 
 **Planned improvements:**
 
--   IMPROV-009: Interactive configuration (CRITICAL for dynamic AI provider switching)
--   IMPROV-010: Phase completion tracking
--   IMPROV-011: Database CLI management
+- Interactive configuration (`--set`, `--show-options`) for dynamic provider switching
+- Phase completion tracking and progress indicators
+- Database CLI management (no SQL required)
 
 ### v0.4.0 — Intelligence & Automation (Q1 2027)
 
 **Focus:** ML, automation, advanced AI
 
--   🔜 **Automated Remediation**: WP-CLI integration for auto-fixing
--   🔜 **ML-Based Detection**: Anomaly detection, false positive reduction
--   🔜 **Distributed Scanning**: Worker nodes for large-scale operations
--   🔜 **Advanced AI Agents**: Autonomous scan planning, exploit generation
+- 🔜 **Automated Remediation**: WP-CLI integration for auto-fixing
+- 🔜 **ML-Based Detection**: Anomaly detection, false positive reduction
+- 🔜 **Distributed Scanning**: Worker nodes for large-scale operations
+- 🔜 **Advanced AI Agents**: Autonomous scan planning, exploit generation
 
 ### Pro Track
 
@@ -1074,10 +1027,10 @@ For detailed feature descriptions, see [ROADMAP.md](ROADMAP.md)
 
 We welcome contributions! Whether it's:
 
--   🐛 Bug reports
--   💡 Feature requests
--   📝 Documentation improvements
--   🔧 Code contributions
+- 🐛 Bug reports
+- 💡 Feature requests
+- 📝 Documentation improvements
+- 🔧 Code contributions
 
 ### How to Contribute
 
@@ -1119,11 +1072,11 @@ Found a bug? Have a feature request?
 
 Please include:
 
--   Argus version (`python -m argus --version`)
--   Python version (`python --version`)
--   Operating system
--   Steps to reproduce (for bugs)
--   Expected vs actual behavior
+- Argus version (`python -m argus --version`)
+- Python version (`python --version`)
+- Operating system
+- Steps to reproduce (for bugs)
+- Expected vs actual behavior
 
 ---
 
@@ -1143,9 +1096,9 @@ Comprehensive documentation available in the `docs/` directory:
 
 ### Quick Links
 
--   **Changelog**: [CHANGELOG.md](CHANGELOG.md)
--   **License**: [LICENSE](LICENSE)
--   **CLI Examples**: [scripts/cli-examples.md](scripts/cli-examples.md)
+- **Changelog**: [CHANGELOG.md](CHANGELOG.md)
+- **License**: [LICENSE](LICENSE)
+- **CLI Examples**: [scripts/cli-examples.md](scripts/cli-examples.md)
 
 ---
 
@@ -1193,10 +1146,10 @@ By using Argus, you acknowledge and agree that:
 
 If you discover vulnerabilities using Argus:
 
--   📧 Contact the site owner privately first
--   ⏰ Give reasonable time to fix (typically 90 days)
--   🤝 Coordinate disclosure timeline
--   📝 Document your findings professionally
+- 📧 Contact the site owner privately first
+- ⏰ Give reasonable time to fix (typically 90 days)
+- 🤝 Coordinate disclosure timeline
+- 📝 Document your findings professionally
 
 ### When in Doubt
 
@@ -1208,13 +1161,13 @@ If you discover vulnerabilities using Argus:
 
 Argus stands on the shoulders of giants:
 
--   **WordPress.org** — Security team for documentation and best practices
--   **WPScan** — Vulnerability research and database
--   **OWASP** — Security standards (Top 10, Testing Guide)
--   **LangChain** — AI framework that powers intelligent analysis
--   **Anthropic & OpenAI** — AI models for vulnerability analysis
--   **Ollama** — Local AI inference for privacy-focused scanning
--   **Python Community** — Amazing libraries and tools
+- **WordPress.org** — Security team for documentation and best practices
+- **WPScan** — Vulnerability research and database
+- **OWASP** — Security standards (Top 10, Testing Guide)
+- **LangChain** — AI framework that powers intelligent analysis
+- **Anthropic & OpenAI** — AI models for vulnerability analysis
+- **Ollama** — Local AI inference for privacy-focused scanning
+- **Python Community** — Amazing libraries and tools
 
 Special thanks to all security researchers who practice and promote ethical hacking.
 
@@ -1224,9 +1177,9 @@ Special thanks to all security researchers who practice and promote ethical hack
 
 **Rodney Dhavid Jimenez Chacin (rodhnin)**
 
--   🌐 Website & Contact: [rodhnin.com](https://rodhnin.com)
--   💼 GitHub: [@rodhnin](https://github.com/rodhnin)
--   🔗 Project: [argus-wp-watcher](https://github.com/rodhnin/argus-wp-watcher)
+- 🌐 Website & Contact: [rodhnin.com](https://rodhnin.com)
+- 💼 GitHub: [@rodhnin](https://github.com/rodhnin)
+- 🔗 Project: [argus-wp-watcher](https://github.com/rodhnin/argus-wp-watcher)
 
 For questions, feedback, or collaboration inquiries, please visit [rodhnin.com](https://rodhnin.com) to contact me.
 
@@ -1234,9 +1187,9 @@ For questions, feedback, or collaboration inquiries, please visit [rodhnin.com](
 
 ## 💬 Community
 
--   **Discussions**: [GitHub Discussions](https://github.com/rodhnin/argus-wp-watcher/discussions)
--   **Issues**: [GitHub Issues](https://github.com/rodhnin/argus-wp-watcher/issues)
--   **Releases**: [GitHub Releases](https://github.com/rodhnin/argus-wp-watcher/releases)
+- **Discussions**: [GitHub Discussions](https://github.com/rodhnin/argus-wp-watcher/discussions)
+- **Issues**: [GitHub Issues](https://github.com/rodhnin/argus-wp-watcher/issues)
+- **Releases**: [GitHub Releases](https://github.com/rodhnin/argus-wp-watcher/releases)
 
 ---
 
@@ -1250,6 +1203,6 @@ For questions, feedback, or collaboration inquiries, please visit [rodhnin.com](
 
 ---
 
-_Argus v0.1.0 — November 2025_
+_Argus v0.2.0 — May 2026_
 
 </div>

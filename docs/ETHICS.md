@@ -664,4 +664,4 @@ This software is provided for **authorized security testing only**. By using Arg
 ---
 
 _Version: 1.0_  
-_Applies to: Argus v0.1.0 and later_
+_Applies to: Argus v0.1.0 and later (current: v0.2.0)_
